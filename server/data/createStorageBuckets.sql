@@ -5,7 +5,7 @@
 -- IMPORTANT: Buckets must be created manually in Supabase Dashboard:
 -- 1. Go to Storage in Supabase Dashboard
 -- 2. Click "New bucket"
--- 3. Create buckets: 'media', 'logos', 'favicons'
+-- 3. Create buckets: 'media', 'logos', 'favicons', 'videos'
 -- 4. Set them as PUBLIC
 -- 5. Configure RLS policies (see below)
 
@@ -77,4 +77,26 @@ CREATE POLICY "Allow authenticated deletes from favicons"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (bucket_id = 'favicons');
+
+-- ============================================
+-- BUCKET: videos
+-- ============================================
+
+-- Allow authenticated users to upload
+CREATE POLICY "Allow authenticated uploads to videos"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'videos');
+
+-- Allow public read access
+CREATE POLICY "Allow public read access to videos"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'videos');
+
+-- Allow authenticated users to delete
+CREATE POLICY "Allow authenticated deletes from videos"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'videos');
 

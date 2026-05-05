@@ -1,0 +1,124 @@
+.admin-client-logos {
+  /* Hérite des styles génériques de l'admin */
+}
+
+.logo-preview-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.logo-preview-cell img {
+  max-width: 100px;
+  max-height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.order-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #f0f0f1;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2c3338;
+}
+
+/* Upload Field */
+.upload-field {
+  display: flex;
+  gap: 8px;
+}
+
+.upload-field input[type='url'] {
+  flex: 1;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.upload-btn.uploading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Upload Progress Bar */
+.upload-progress-bar {
+  margin-top: 8px;
+  height: 4px;
+  background-color: #dcdcde;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background-color: #2271b1;
+  transition: width 0.2s ease;
+}
+
+/* Logo Preview in Form */
+.logo-preview {
+  margin-top: 12px;
+  padding: 20px;
+  background-color: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+}
+
+/* Checkbox Wrapper */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.checkbox-wrapper span {
+  user-select: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+  .logo-preview-cell img {
+    max-width: 80px;
+    max-height: 30px;
+  }
+
+  .order-badge {
+    font-size: 0.8125rem;
+    padding: 3px 6px;
+  }
+
+  .upload-field {
+    flex-direction: column;
+  }
+
+  .upload-btn {
+    width: 100%;
+  }
+}

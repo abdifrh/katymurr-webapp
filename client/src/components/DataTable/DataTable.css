@@ -1,20 +1,17 @@
-/* DataTable Container */
 .data-table-container {
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .data-table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid #c3c4c7;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  background: #fff;
-  
-  /* Custom Scrollbar */
+  border: 1px solid #d8d2ca;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(23, 30, 36, 0.08);
   scrollbar-width: thin;
-  scrollbar-color: #9A4818 #f1f1f1;
+  scrollbar-color: #c19a6b #f3f0ec;
 }
 
 .data-table-wrapper::-webkit-scrollbar {
@@ -23,68 +20,67 @@
 }
 
 .data-table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 5px;
+  background: #f3f0ec;
 }
 
 .data-table-wrapper::-webkit-scrollbar-thumb {
-  background: #9A4818;
-  border-radius: 5px;
-  border: 2px solid #f1f1f1;
+  background: #c19a6b;
+  border-radius: 999px;
+  border: 2px solid #f3f0ec;
 }
 
 .data-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #7a3a14;
+  background: #a88a68;
 }
 
-/* Table Styles */
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: #fff;
 }
 
 .data-table thead {
-  background: #f6f7f7;
-  border-bottom: 2px solid #c3c4c7;
+  background: linear-gradient(180deg, #f9f7f4 0%, #f2ede7 100%);
 }
 
 .data-table th {
-  padding: 12px 15px;
+  padding: 14px 16px;
   text-align: left;
-  font-weight: 600;
-  color: #1d2327;
+  font-weight: 700;
+  color: #2e2a25;
   font-size: 14px;
-  border-bottom: 1px solid #c3c4c7;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid #ded7cf;
 }
 
 .data-table th.sortable {
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .data-table th.sortable:hover {
-  background-color: #e5e5e5;
+  background-color: #ece4da;
 }
 
 .data-table .th-content {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
 .data-table .sort-indicator {
-  color: #9A4818;
-  font-size: 12px;
-  font-weight: normal;
+  color: #8b6741;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid #c3c4c7;
-  transition: background-color 0.15s;
+  border-bottom: 1px solid #ece8e2;
+  transition: background-color 0.15s ease;
 }
 
 .data-table tbody tr:hover {
-  background-color: #f6f7f7;
+  background-color: #f8f4ef;
 }
 
 .data-table tbody tr.clickable-row {
@@ -92,29 +88,34 @@
 }
 
 .data-table tbody tr.clickable-row:hover {
-  background-color: #e5e5e5;
+  background-color: #f2e8db;
 }
 
 .data-table tbody tr.unread {
-  background-color: #fff3cd;
-  font-weight: 500;
+  background-color: #fff6e5;
+  font-weight: 600;
 }
 
 .data-table tbody tr.unread:hover {
-  background-color: #ffe69c;
+  background-color: #ffefcc;
 }
 
 .data-table td {
-  padding: 12px 15px;
-  font-size: 14px;
-  color: #1d2327;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: #2f3439;
   vertical-align: middle;
+  border-bottom: 1px solid #f1eeea;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .data-table .no-items {
   text-align: center;
   padding: 40px 20px;
-  color: #646970;
+  color: #66615a;
   font-style: italic;
 }
 
@@ -123,17 +124,14 @@
   text-align: center;
 }
 
-/* Responsive Design */
 @media (max-width: 782px) {
   .data-table-wrapper {
-    border: none;
-    box-shadow: none;
+    border-radius: 14px;
+    border-color: #d9d2c8;
   }
 
   .data-table {
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    overflow: hidden;
+    border: none;
   }
 
   .data-table thead {
@@ -142,12 +140,12 @@
 
   .data-table tbody tr {
     display: block;
-    margin-bottom: 15px;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    padding: 10px;
+    margin: 0 0 14px 0;
+    border: 1px solid #e1dbd2;
+    border-radius: 12px;
+    padding: 12px;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(28, 33, 37, 0.06);
   }
 
   .data-table tbody tr:last-child {
@@ -156,27 +154,30 @@
 
   .data-table td {
     display: block;
-    padding: 8px 0;
     text-align: right;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #efeae3;
     position: relative;
-    padding-left: 50%;
+    padding: 10px 0 10px 48%;
+    font-size: 14px;
   }
 
   .data-table td:last-child {
     border-bottom: none;
   }
 
-  .data-table td:before {
+  .data-table td::before {
     content: attr(data-label);
     position: absolute;
     left: 0;
-    width: 45%;
+    width: 44%;
     padding-right: 10px;
     white-space: nowrap;
     text-align: left;
-    font-weight: 600;
-    color: #1d2327;
+    font-weight: 700;
+    font-size: 12px;
+    color: #3a342e;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
 
   .data-table .no-items {
@@ -184,4 +185,3 @@
     padding: 20px;
   }
 }
-

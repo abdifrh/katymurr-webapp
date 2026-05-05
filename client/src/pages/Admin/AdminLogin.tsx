@@ -25,7 +25,6 @@ function AdminLogin() {
       if (error) throw error
 
       if (data.session) {
-        localStorage.setItem('supabase_token', data.session.access_token)
         navigate('/admin')
       }
     } catch (err: any) {

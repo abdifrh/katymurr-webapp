@@ -1,31 +1,8 @@
 import express from 'express';
 import { supabase } from '../index.js';
+import { verifyAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
-
-// Middleware to verify admin authentication
-const verifyAdmin = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-
-    // Verify token with Supabase
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // Check if user is admin (you can add a role check here)
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(401).json({ error: 'Authentication failed' });
-  }
-};
 
 // Apply auth middleware to all admin routes
 router.use(verifyAdmin);
@@ -871,7 +848,70 @@ router.delete('/settings/:id', async (req, res) => {
       .from('site_settings')
       .delete()
       .eq('id', id);
-    
+
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Client Logos management
+router.get('/client-logos', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('client_logos')
+      .select('*')
+      .order('order_index', { ascending: true })
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    res.json(data || []);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/client-logos', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('client_logos')
+      .insert(req.body)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/client-logos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data, error } = await supabase
+      .from('client_logos')
+      .update(req.body)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/client-logos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase
+      .from('client_logos')
+      .delete()
+      .eq('id', id);
+
     if (error) throw error;
     res.json({ success: true });
   } catch (error) {

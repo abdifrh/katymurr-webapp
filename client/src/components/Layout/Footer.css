@@ -1,185 +1,101 @@
 .footer {
   background-color: var(--color-dark);
   color: var(--color-white);
-  padding: 0 0 var(--spacing-md) 0;
-  margin-top: 0;
-  padding-top: var(--spacing-xl);
-}
-
-/* Newsletter Section - Full Width at Top */
-.footer-newsletter-full {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto var(--spacing-xl) auto;
-  text-align: center;
   padding: var(--spacing-lg) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.footer-newsletter-full h4 {
-  color: var(--color-white);
-  margin-bottom: var(--spacing-sm);
-  font-size: 1.5rem;
+  margin-top: 0;
 }
 
 .footer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.footer-logo {
-  height: 100px;
-  width: auto;
-  margin-bottom: var(--spacing-sm);
-  filter: brightness(0) invert(1); /* Rend le logo blanc - retirez si votre logo est déjà blanc */
-}
-
-.footer-section h3,
-.footer-section h4 {
-  color: var(--color-white);
-  margin-bottom: var(--spacing-sm);
-}
-
-.footer-section p {
-  color: var(--color-white);
-  margin-bottom: var(--spacing-xs);
-}
-
-.footer-section p a {
-  color: var(--color-white);
-  text-decoration: underline;
-  transition: color var(--transition-fast);
-}
-
-.footer-section p a:hover {
-  color: var(--color-warm);
-}
-
-.footer-nav {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-md);
+  text-align: center;
 }
 
-.footer-nav a {
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.footer-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.footer-contact a {
   color: var(--color-white);
-  text-decoration: underline;
+  text-decoration: none;
   transition: color var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-ui-sm);
+  font-weight: var(--font-weight-ui);
 }
 
-.footer-nav a:hover {
+.footer-contact a:hover {
   color: var(--color-warm);
 }
 
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: var(--spacing-md);
-  text-align: center;
+.footer-contact .separator {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 var(--spacing-xs);
 }
 
-.footer-bottom p {
-  color: var(--color-white);
-  font-size: 0.9rem;
+.footer-copyright {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-ui-xs);
+  font-weight: var(--font-weight-body);
 }
 
-/* Newsletter Section (old - kept for backward compatibility) */
-.footer-newsletter {
-  max-width: 350px;
-}
-
-.footer-legal {
-  max-width: 250px;
-}
-
-.newsletter-description {
-  font-size: 0.9rem;
-  margin-bottom: var(--spacing-md);
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.6;
-}
-
-.newsletter-form {
+.footer-links {
   display: flex;
-  flex-direction: row;
-  gap: var(--spacing-sm);
-  max-width: 500px;
-  margin: var(--spacing-md) auto 0 auto;
   justify-content: center;
-  align-items: stretch;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.footer-newsletter-full .newsletter-form {
-  flex-direction: row;
-}
-
-.newsletter-input {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
-  font-family: var(--font-primary);
-  font-size: 0.95rem;
-  transition: all var(--transition-fast);
-  flex: 1;
-  min-width: 200px;
-}
-
-.footer-newsletter-full .newsletter-input {
-  flex: 1;
-  max-width: 400px;
-}
-
-.newsletter-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.newsletter-input:focus {
-  outline: none;
-  border-color: var(--color-warm);
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.newsletter-button {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background-color: var(--color-accent);
-  color: var(--color-white);
-  border: none;
-  border-radius: 4px;
-  font-family: var(--font-primary);
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+.footer-links a {
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  white-space: nowrap;
-  flex-shrink: 0;
+  font-size: var(--font-size-ui-xs);
+  font-weight: var(--font-weight-ui);
+  transition: color var(--transition-fast);
 }
 
-.newsletter-button:hover {
-  background-color: var(--color-warm);
-  transform: translateY(-1px);
+.footer-links a:hover {
+  color: var(--color-warm);
 }
 
-.newsletter-success {
-  padding: var(--spacing-sm);
-  background-color: rgba(214, 155, 113, 0.2);
-  border: 1px solid var(--color-warm);
-  border-radius: 4px;
+.footer-social {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-sm);
+}
+
+.footer-linkedin-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: var(--color-white);
-  text-align: center;
-  font-size: 0.9rem;
+  text-decoration: none;
+  font-size: var(--font-size-ui-sm);
+  font-weight: var(--font-weight-ui);
+  transition: all var(--transition-fast);
 }
 
-.newsletter-error {
-  color: rgba(255, 200, 200, 0.9);
-  font-size: 0.85rem;
-  margin-top: var(--spacing-xs);
-  text-align: center;
+.footer-linkedin-button:hover {
+  color: var(--color-dark);
+  background-color: var(--color-warm);
+  border-color: var(--color-warm);
 }
 
 /* Scroll to Top Button */
@@ -189,10 +105,10 @@
   right: 30px;
   width: 50px;
   height: 50px;
-  background: #9A4818;
+  background: #C19A6B;
   color: var(--color-white);
   border: none;
-  border-radius: 50%;
+  border-radius: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -213,7 +129,7 @@
 }
 
 .scroll-to-top:hover {
-  background: #7a3a14;
+  background: #A88A68;
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(154, 72, 24, 0.5);
 }
@@ -259,6 +175,11 @@
     max-width: 100%;
   }
 
+  .footer-linkedin-button {
+    width: 100%;
+    justify-content: center;
+  }
+
   .scroll-to-top {
     bottom: 20px;
     right: 20px;
@@ -271,4 +192,3 @@
     height: 20px;
   }
 }
-

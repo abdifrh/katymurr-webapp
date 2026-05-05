@@ -1,7 +1,7 @@
 .wp-admin-analytics {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 24px;
 }
@@ -13,7 +13,7 @@
   margin-bottom: 32px;
   padding: 20px;
   background: #f9f9f9;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid #e0e0e0;
 }
 
@@ -40,7 +40,7 @@
   background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
   border: 1px solid #c3c4c7;
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
@@ -61,7 +61,7 @@
   margin: 0;
   font-size: 32px;
   font-weight: 600;
-  color: #9A4818;
+  color: #C19A6B;
 }
 
 .analytics-sections {
@@ -74,7 +74,7 @@
   background: #fff;
   border: 1px solid #c3c4c7;
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -115,7 +115,7 @@
   background: #fff;
   border: 1px solid #c3c4c7;
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s ease;
 }
@@ -193,7 +193,7 @@
   .wp-list-table tbody tr {
     display: block;
     border: 1px solid #c3c4c7;
-    border-radius: 4px;
+    border-radius: 0;
     margin-bottom: 15px;
     padding: 15px;
     background: #fff;

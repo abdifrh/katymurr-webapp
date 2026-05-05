@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminNewsletterSubscribers, deleteAdminNewsletterSubscriber } from '../../services/api'
 import './AdminNewsletter.css'
 
 interface Subscriber {
@@ -40,39 +41,6 @@ interface Campaign {
   language: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchSubscribers() {
-  const response = await fetch(`${API_BASE_URL}/admin/newsletter/subscribers`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch subscribers')
-  return response.json()
-}
-
-async function fetchTemplates() {
-  const response = await fetch(`${API_BASE_URL}/admin/newsletter/templates`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch templates')
-  return response.json()
-}
-
-async function fetchCampaigns() {
-  const response = await fetch(`${API_BASE_URL}/admin/newsletter/campaigns`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch campaigns')
-  return response.json()
-}
-
 function AdminNewsletter() {
   const [activeTab, setActiveTab] = useState<'subscribers' | 'templates' | 'campaigns'>('subscribers')
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
@@ -88,14 +56,14 @@ function AdminNewsletter() {
     try {
       setLoading(true)
       if (activeTab === 'subscribers') {
-        const data = await fetchSubscribers()
+        const data = await fetchAdminNewsletterSubscribers()
         setSubscribers(data)
       } else if (activeTab === 'templates') {
-        const data = await fetchTemplates()
-        setTemplates(data)
+        // Templates not yet implemented in API
+        setTemplates([])
       } else if (activeTab === 'campaigns') {
-        const data = await fetchCampaigns()
-        setCampaigns(data)
+        // Campaigns not yet implemented in API
+        setCampaigns([])
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -140,10 +108,7 @@ function AdminNewsletter() {
                 onDelete={async (id) => {
                   if (confirm('Delete this subscriber?')) {
                     try {
-                      await fetch(`${API_BASE_URL}/admin/newsletter/subscribers/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${token}` },
-                      })
+                      await deleteAdminNewsletterSubscriber(id)
                       loadData()
                     } catch (error) {
                       alert('Failed to delete subscriber')

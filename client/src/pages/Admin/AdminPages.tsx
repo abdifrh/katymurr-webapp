@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminPages, createAdminPage, updateAdminPage, deleteAdminPage, fetchAdminMedia } from '../../services/api'
+import { supabase } from '../../utils/supabase'
 import './AdminPages.css'
 import './AdminForms.css'
 
@@ -15,19 +17,6 @@ interface Page {
   meta_description: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchPages() {
-  const response = await fetch(`${API_BASE_URL}/admin/pages`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch pages')
-  return response.json()
-}
-
 function AdminPages() {
   const [pages, setPages] = useState<Page[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,7 +29,7 @@ function AdminPages() {
   const loadPages = async () => {
     try {
       setLoading(true)
-      const data = await fetchPages()
+      const data = await fetchAdminPages()
       setPages(data)
     } catch (error) {
       console.error('Error loading pages:', error)
@@ -51,15 +40,9 @@ function AdminPages() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this page?')) return
-    
+
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/pages/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to delete page')
+      await deleteAdminPage(id)
       loadPages()
     } catch (error) {
       console.error('Error deleting page:', error)
@@ -179,13 +162,7 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
 
   const loadMedia = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/media`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to fetch media')
-      const data = await response.json()
+      const data = await fetchAdminMedia()
       setMedia(data)
     } catch (error) {
       console.error('Error loading media:', error)
@@ -195,13 +172,21 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
   const handleFileUpload = async (file: File) => {
     try {
       setUploading(true)
+
+      // Get token from Supabase session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
       const uploadFormData = new FormData()
       uploadFormData.append('file', file)
       uploadFormData.append('category', uploadCategory)
       uploadFormData.append('alt_text', `Image for ${formData.title || 'page'}`)
 
+      const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
       const xhr = new XMLHttpRequest()
-      
+
       xhr.upload.addEventListener('progress', () => {
         // Progress handled by UI
       })
@@ -225,7 +210,7 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
       })
 
       xhr.open('POST', `${API_BASE_URL}/upload`)
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`)
       xhr.send(uploadFormData)
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -237,22 +222,11 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const url = page.id
-        ? `${API_BASE_URL}/admin/pages/${page.id}`
-        : `${API_BASE_URL}/admin/pages`
-      
-      const method = page.id ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) throw new Error('Failed to save page')
+      if (page.id) {
+        await updateAdminPage(page.id, formData)
+      } else {
+        await createAdminPage(formData)
+      }
       onSave()
     } catch (error) {
       console.error('Error saving page:', error)
@@ -261,15 +235,15 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
   }
 
   return (
-    <div className="admin-form-container">
-      <div className="admin-form-header">
-        <h2>{page.id ? '✏️ Edit Page' : '➕ Add New Page'}</h2>
-        <p className="form-description">
-          {page.id ? 'Update the page information below.' : 'Create a new page by filling in the details below.'}
-        </p>
-      </div>
-      <div className="admin-form-body">
-        <form onSubmit={handleSubmit}>
+    <div className="editor-overlay">
+      <div className="editor-container editor-large">
+        <div className="editor-header">
+          <h3>{page.id ? 'Edit Page' : 'Add New Page'}</h3>
+          <button className="editor-close" onClick={onCancel} type="button">
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="editor-form">
           {/* Basic Information Section */}
           <div className="form-section">
             <h3 className="form-section-title">📄 Basic Information</h3>
@@ -463,12 +437,12 @@ function PageEditor({ page, onSave, onCancel }: { page: Page, onSave: () => void
             </div>
           </div>
 
-          <div className="form-actions">
-            <button type="button" className="button button-secondary" onClick={onCancel}>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button type="submit" className="button button-primary">
-              {page.id ? '💾 Update Page' : '✨ Create Page'}
+            <button type="submit" className="btn btn-primary">
+              {page.id ? 'Update Page' : 'Create Page'}
             </button>
           </div>
         </form>

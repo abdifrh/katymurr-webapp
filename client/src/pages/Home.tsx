@@ -11,6 +11,8 @@ import { fetchReferences, fetchBlogPosts, fetchServices, fetchPage } from '../se
 import ReferenceCard from '../components/ReferenceCard/ReferenceCard'
 import Loader from '../components/Loader/Loader'
 import AnimatedSection from '../components/AnimatedSection/AnimatedSection'
+import LogoCarousel from '../components/LogoCarousel/LogoCarousel'
+import { GlobalSchema, SEO } from '../components/SEO/SEO'
 import './Home.css'
 
 interface Reference {
@@ -59,33 +61,40 @@ function Home() {
   const [services, setServices] = useState<Service[]>([])
   const [homePage, setHomePage] = useState<HomePage | null>(null)
   const [loading, setLoading] = useState(true)
-  
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
+  const [testimonialFading, setTestimonialFading] = useState(false)
+
   // Récupérer les valeurs hero dynamiquement depuis les settings
   // Utiliser settings dans les dépendances pour forcer le re-render quand les settings changent
+  const heroMediaType = getSetting('hero_media_type') || 'image'
   const heroImageUrl = getSetting('hero_image_url') || '/images/hero-image.jpg'
+  const heroVideoUrl = getSetting('hero_video_url') || ''
   const heroTitle = getSetting('hero_title', language) || (language === 'en' ? 'Welcome to Katy Murr' : 'Bienvenue chez Katy Murr')
   const heroSubtitle = getSetting('hero_subtitle', language) || (language === 'en' ? 'Professional English Coaching, Conference Interpreting & Writing Services' : 'Services professionnels de Coaching en anglais, Interprétation de conférence & Écriture')
-  const heroCtaText = getSetting('hero_cta_text', language) || (language === 'en' ? 'Get Started' : 'Commencer')
+  const heroCtaText = getSetting('hero_cta_text', language) || (language === 'en' ? 'Start Improving Your Communication Today' : 'Commencez à améliorer votre communication dès aujourd\'hui')
   const heroCtaLink = getSetting('hero_cta_link') || '/contact'
+  const ctaImageUrl = getSetting('cta_image_url') || '/images/cta-image.jpg'
 
   useEffect(() => {
     let cancelled = false
-    
+
     const loadData = async () => {
       try {
         setLoading(true)
         // Charger toutes les données en parallèle
-        const [refsEn, postsEn, servicesData, pageData] = await Promise.all([
+        const [refsEn, refsFr, postsEn, servicesData, pageData] = await Promise.all([
           fetchReferences('en', true),
+          fetchReferences('fr', true),
           fetchBlogPosts('en', 2),
           fetchServices(language, true),
           fetchPage('home', language).catch(() => null) // Si la page n'existe pas, on utilise le fallback
         ])
-        
+
         if (cancelled) return
-        
-        // Prendre les 4 premières références en anglais
-        setFeaturedReferences(refsEn.slice(0, 4))
+
+        // Combiner les références EN et FR featured, prendre les 6 premières
+        const allFeaturedRefs = [...refsEn, ...refsFr].slice(0, 6)
+        setFeaturedReferences(allFeaturedRefs)
         setRecentPosts(postsEn)
         // Prendre les services pour le carousel (limiter à 4)
         setServices(servicesData.slice(0, 4))
@@ -101,11 +110,41 @@ function Home() {
       }
     }
     loadData()
-    
+
     return () => {
       cancelled = true
     }
   }, [language])
+
+  // Auto-rotate testimonials every 5 seconds with fade effect
+  useEffect(() => {
+    const refsCount = featuredReferences.length
+    if (refsCount <= 1) return
+
+    const interval = setInterval(() => {
+      setTestimonialFading(true)
+
+      setTimeout(() => {
+        setCurrentTestimonialIndex(prevIndex => {
+          let newIndex
+          do {
+            newIndex = Math.floor(Math.random() * refsCount)
+          } while (newIndex === prevIndex && refsCount > 1)
+          return newIndex
+        })
+        setTestimonialFading(false)
+      }, 500) // Duration of fade out
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [featuredReferences])
+
+  // Reset index if it becomes out of bounds
+  useEffect(() => {
+    if (featuredReferences.length > 0 && currentTestimonialIndex >= featuredReferences.length) {
+      setCurrentTestimonialIndex(0)
+    }
+  }, [featuredReferences.length, currentTestimonialIndex])
 
   // Le hero utilise toujours les settings dynamiques
   // Ne pas utiliser homePage?.content pour le hero, seulement pour d'autres sections si nécessaire
@@ -152,11 +191,36 @@ function Home() {
         <meta name="twitter:image" content={heroImageUrl.startsWith('http') ? heroImageUrl : `https://katymurr.com${heroImageUrl}`} />
       </Helmet>
 
+      {/* JSON-LD Structured Data */}
+      <GlobalSchema />
+      <SEO
+        title={homePage?.meta_title || 'Katy Murr'}
+        description={homePage?.meta_description || 'Professional English coaching, conference interpreting, and writing services.'}
+        image={heroImageUrl}
+        type="website"
+      />
+
       <div className="home">
         {/* Hero Section */}
         <section className="hero">
           <div className="hero-background">
-            <img src={heroImageUrl} alt="Katy Murr" className="hero-image" />
+            {heroMediaType === 'video' && heroVideoUrl ? (
+              <video
+                key={heroVideoUrl}
+                className="hero-video"
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={heroVideoUrl}
+                aria-label="Hero background video"
+              >
+                {/* Fallback image si la vidéo ne peut pas être chargée */}
+                <img src={heroImageUrl} alt="Katy Murr" className="hero-image" />
+              </video>
+            ) : (
+              <img src={heroImageUrl} alt="Katy Murr" className="hero-image" />
+            )}
             <div className="hero-overlay"></div>
           </div>
           <div className="container">
@@ -166,12 +230,48 @@ function Home() {
               <h2 className="hero-tagline">{heroSubtitle}</h2>
               <div className="hero-actions">
                 <Link to={heroCtaLink} className="btn btn-primary">
-                  {heroCtaText}
+                  {heroCtaText} <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
                 </Link>
               </div>
             </div>
           </div>
         </section>
+
+        {/* About Preview */}
+        <AnimatedSection animation="fadeInUp" delay={0.1}>
+          <section className="section about-preview">
+            <div className="container">
+              <div className="about-preview-grid">
+                <div className="about-preview-image">
+                  <img
+                    src="/images/about-portrait.png"
+                    alt={language === 'en' ? 'Portrait of Katy Murr' : 'Portrait de Katy Murr'}
+                  />
+                </div>
+                <div className="about-preview-content">
+                  <h2 className="section-title text-left">
+                    {language === 'en' ? 'About Me' : 'À propos de moi'}
+                  </h2>
+                  <p className="lead-text">
+                    {language === 'en'
+                      ? 'Your message matters.'
+                      : 'Votre message compte.'
+                    }
+                  </p>
+                  <p>
+                    {language === 'en'
+                      ? 'I help business leaders communicate with clarity, confidence, and impact, drawing on over a decade of experience in international conference interpreting and executive English coaching.'
+                      : 'J\'aide les dirigeants d\'entreprise à communiquer avec clarté, confiance et impact, en m\'appuyant sur plus d\'une décennie d\'expérience en interprétation pour des conférences internationales et en coaching d\'anglais pour cadres.'
+                    }
+                  </p>
+                  <Link to="/about" className="btn btn-secondary mt-md">
+                    {language === 'en' ? 'Learn More About My Journey' : 'En savoir plus sur mon parcours'} <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        </AnimatedSection>
 
         {/* Services Preview */}
         {services.length > 0 && (
@@ -182,55 +282,56 @@ function Home() {
                   {language === 'en' ? 'Services' : 'Services'}
                 </h2>
                 <div className="services-carousel-wrapper">
-                <Swiper
-                  modules={[Pagination, Autoplay]}
-                  spaceBetween={30}
-                  slidesPerView={1}
-                  breakpoints={{
-                    640: {
-                      slidesPerView: 2,
-                      spaceBetween: 20,
-                    },
-                    768: {
-                      slidesPerView: 2,
-                      spaceBetween: 30,
-                    },
-                    1024: {
-                      slidesPerView: 2,
-                      spaceBetween: 30,
-                    },
-                  }}
-                  navigation={false}
-                  pagination={{
-                    clickable: true,
-                    dynamicBullets: true,
-                  }}
-                  autoplay={{
-                    delay: 4000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: true,
-                  }}
-                  loop={services.length > 2}
-                  grabCursor={true}
-                  className="services-swiper"
-                >
-                  {services.map((service) => (
-                    <SwiperSlide key={service.id}>
-                      <div className="service-card">
-                        <h3>{service.title}</h3>
-                        <p>
-                          {service.description || service.subtitle || ''}
-                        </p>
-                        <Link to={`/services/${service.slug}`} className="service-link">
-                          {language === 'en' ? 'Learn more →' : 'En savoir plus →'}
-                        </Link>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                  <Swiper
+                    modules={[Pagination, Autoplay]}
+                    spaceBetween={30}
+                    slidesPerView={1}
+                    breakpoints={{
+                      480: {
+                        slidesPerView: 1.2,
+                        spaceBetween: 20,
+                      },
+                      768: {
+                        slidesPerView: 2,
+                        spaceBetween: 30,
+                      },
+                      1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 30,
+                      },
+                    }}
+                    navigation={false}
+                    pagination={{
+                      clickable: true,
+                      dynamicBullets: true,
+                    }}
+                    autoplay={{
+                      delay: 4000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    }}
+                    loop={services.length > 2}
+                    grabCursor={true}
+                    className="services-swiper"
+                  >
+                    {services.map((service, index) => (
+                      <SwiperSlide key={service.id}>
+                        <div className="service-card">
+                          <span className="service-number">{(index + 1).toString().padStart(2, '0')}</span>
+                          <h3>{service.title}</h3>
+                          <p>
+                            {service.description || service.subtitle || ''}
+                          </p>
+                          <Link to={`/services/${service.slug}`} className="service-link">
+                            {language === 'en' ? 'Learn more' : 'En savoir plus'} <i className="fas fa-arrow-right"></i>
+                          </Link>
+                        </div>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
           </AnimatedSection>
         )}
 
@@ -242,30 +343,56 @@ function Home() {
                 <h2 className="section-title">
                   {language === 'en' ? 'What Clients Say' : 'Témoignages'}
                 </h2>
-                <div className="references-grid">
-                {featuredReferences.map((ref) => (
-                  <ReferenceCard
-                    key={ref.id}
-                    id={ref.id}
-                    name={ref.name}
-                    position={ref.position}
-                    institution={ref.institution}
-                    institution_logo={ref.institution_logo}
-                    testimonial={ref.testimonial}
-                    maxLength={150}
-                    language={language}
-                  />
-                ))}
+                <div className="testimonial-carousel">
+                  <div
+                    key={featuredReferences[currentTestimonialIndex]?.id || currentTestimonialIndex}
+                    className={`testimonial-item ${testimonialFading ? 'fading' : ''}`}
+                  >
+                    {featuredReferences[currentTestimonialIndex] && (
+                      <ReferenceCard
+                        id={featuredReferences[currentTestimonialIndex].id}
+                        name={featuredReferences[currentTestimonialIndex].name}
+                        position={featuredReferences[currentTestimonialIndex].position}
+                        institution={featuredReferences[currentTestimonialIndex].institution}
+                        institution_logo={featuredReferences[currentTestimonialIndex].institution_logo}
+                        testimonial={featuredReferences[currentTestimonialIndex].testimonial}
+                        maxLength={300}
+                        language={language}
+                      />
+                    )}
+                  </div>
+                  <div className="testimonial-dots">
+                    {featuredReferences.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`testimonial-dot ${index === currentTestimonialIndex ? 'active' : ''}`}
+                        onClick={() => {
+                          setTestimonialFading(true)
+                          setTimeout(() => {
+                            setCurrentTestimonialIndex(index)
+                            setTestimonialFading(false)
+                          }, 500)
+                        }}
+                        aria-label={`Voir témoignage ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center mt-md">
+                  <Link to="/references" className="btn btn-secondary">
+                    <i className="fas fa-quote-left" style={{ marginRight: '8px' }}></i>
+                    {language === 'en' ? 'View All References' : 'Voir toutes les références'}
+                  </Link>
+                </div>
               </div>
-              <div className="text-center mt-md">
-                <Link to="/references" className="btn btn-secondary">
-                  {language === 'en' ? 'View All References' : 'Voir toutes les références'}
-                </Link>
-              </div>
-            </div>
-          </section>
+            </section>
           </AnimatedSection>
         )}
+
+        {/* Logo Carousel - Client Logos */}
+        <AnimatedSection animation="fadeInUp" delay={0.25}>
+          <LogoCarousel />
+        </AnimatedSection>
 
         {/* Recent Blog Posts */}
         {recentPosts.length > 0 && (
@@ -276,67 +403,76 @@ function Home() {
                   {language === 'en' ? 'Latest from the Blog' : 'Derniers articles'}
                 </h2>
                 <div className="blog-grid">
-                {recentPosts.map((post) => (
-                  <article key={post.id} className="blog-card">
-                    {post.featured_image && (
-                      <div className="blog-card-image">
-                        <img src={post.featured_image} alt={post.title} />
+                  {recentPosts.map((post) => (
+                    <article key={post.id} className="blog-card">
+                      {post.featured_image && (
+                        <div className="blog-card-image">
+                          <img src={post.featured_image} alt={post.title} />
+                        </div>
+                      )}
+                      <div className="blog-card-content">
+                        <h3>{post.title}</h3>
+                        {post.excerpt && <p>{post.excerpt}</p>}
+                        <Link to={`/blog/${post.slug}`} className="blog-link">
+                          {language === 'en' ? 'Read more' : 'Lire la suite'} <i className="fas fa-arrow-right" style={{ fontSize: '0.8em' }}></i>
+                        </Link>
                       </div>
-                    )}
-                    <div className="blog-card-content">
-                      <h3>{post.title}</h3>
-                      {post.excerpt && <p>{post.excerpt}</p>}
-                      <Link to={`/blog/${post.slug}`} className="blog-link">
-                        {language === 'en' ? 'Read more →' : 'Lire la suite →'}
-                      </Link>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  ))}
+                </div>
+                <div className="text-center mt-md">
+                  <Link to="/blog" className="btn btn-secondary">
+                    <i className="fas fa-newspaper" style={{ marginRight: '8px' }}></i>
+                    {language === 'en' ? 'View All Posts' : 'Voir tous les articles'}
+                  </Link>
+                </div>
               </div>
-              <div className="text-center mt-md">
-                <Link to="/blog" className="btn btn-secondary">
-                  {language === 'en' ? 'View All Posts' : 'Voir tous les articles'}
-                </Link>
-              </div>
-            </div>
-          </section>
+            </section>
           </AnimatedSection>
         )}
 
         {/* CTA Section */}
         <AnimatedSection animation="fadeInUp" delay={0.4}>
           <section className="section cta-section">
+            <div
+              className="cta-background"
+              style={{ backgroundImage: `url(${ctaImageUrl})` }}
+            >
+              <div className="cta-overlay"></div>
+            </div>
             <div className="container">
               <div className="cta-content">
-              {ctaContent ? (
-                <div 
-                  className="cta-section-content"
-                  dangerouslySetInnerHTML={{ __html: ctaContent }}
-                />
-              ) : (
-                <>
-                  <h2>
-                    {language === 'en'
-                      ? 'Ready to improve your communication?'
-                      : 'Prêt à améliorer votre communication ?'
-                    }
-                  </h2>
-                  <p>
-                    {language === 'en'
-                      ? 'Let\'s work together to achieve your language and communication goals. Get in touch to discuss your project.'
-                      : 'Travaillons ensemble pour atteindre vos objectifs linguistiques et de communication. Contactez-moi pour discuter de votre projet.'
-                    }
-                  </p>
-                  <div className="cta-actions">
-                    <Link to="/contact" className="btn btn-primary">
-                      {language === 'en' ? 'Get in Touch' : 'Contactez-moi'}
-                    </Link>
-                    <Link to="/services" className="btn btn-secondary">
-                      {language === 'en' ? 'View Services' : 'Voir les services'}
-                    </Link>
-                  </div>
-                </>
-              )}
+                {ctaContent ? (
+                  <div
+                    className="cta-section-content"
+                    dangerouslySetInnerHTML={{ __html: ctaContent }}
+                  />
+                ) : (
+                  <>
+                    <h2>
+                      {language === 'en'
+                        ? 'Ready to communicate with confidence and influence?'
+                        : 'Prêt à communiquer avec confiance et influence ?'
+                      }
+                    </h2>
+                    <p>
+                      {language === 'en'
+                        ? 'Get in touch to discuss your project and start making an impact.'
+                        : 'Contactez-nous pour discuter de votre projet et commencer à avoir un impact.'
+                      }
+                    </p>
+                    <div className="cta-actions">
+                      <Link to="/contact" className="btn btn-primary">
+                        <i className="fas fa-paper-plane" style={{ marginRight: '8px' }}></i>
+                        {language === 'en' ? 'Get in Touch' : 'Contactez-nous'}
+                      </Link>
+                      <Link to="/services" className="btn btn-secondary">
+                        <i className="fas fa-th-list" style={{ marginRight: '8px' }}></i>
+                        {language === 'en' ? 'View Services' : 'Voir les services'}
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </section>

@@ -103,7 +103,7 @@
 .button-link {
   background: none;
   border: none;
-  color: #9A4818;
+  color: #C19A6B;
   cursor: pointer;
   text-decoration: none;
   font-size: 13px;
@@ -166,13 +166,13 @@
   font-size: 13px;
   line-height: 1.5;
   border: 1px solid #8c8f94;
-  border-radius: 3px;
+  border-radius: 0;
   box-sizing: border-box;
 }
 
 .regular-text:focus {
-  border-color: #9A4818;
-  box-shadow: 0 0 0 1px #9A4818;
+  border-color: #C19A6B;
+  box-shadow: 0 0 0 1px #C19A6B;
   outline: 2px solid transparent;
 }
 
@@ -182,7 +182,7 @@
   font-size: 13px;
   line-height: 1.5;
   border: 1px solid #8c8f94;
-  border-radius: 3px;
+  border-radius: 0;
   box-sizing: border-box;
 }
 
@@ -197,7 +197,7 @@
   font-size: 13px;
   line-height: 1.5;
   border: 1px solid #8c8f94;
-  border-radius: 3px;
+  border-radius: 0;
   box-sizing: border-box;
 }
 
@@ -218,14 +218,14 @@
   cursor: pointer;
   border-width: 1px;
   border-style: solid;
-  border-radius: 3px;
+  border-radius: 0;
   white-space: nowrap;
   box-sizing: border-box;
 }
 
 .button-primary {
-  background: #9A4818;
-  border-color: #9A4818;
+  background: #C19A6B;
+  border-color: #C19A6B;
   color: #fff;
 }
 
@@ -260,7 +260,7 @@
 
 .section-item {
   border: 1px solid #c3c4c7;
-  border-radius: 3px;
+  border-radius: 0;
   padding: 15px;
   background: #f9f9f9;
 }
@@ -287,7 +287,7 @@
 
 .step-item {
   border: 1px solid #dcdcde;
-  border-radius: 3px;
+  border-radius: 0;
   padding: 10px;
   margin-bottom: 10px;
   background: #fff;
@@ -327,7 +327,7 @@
   .wp-list-table tbody tr {
     display: block;
     border: 1px solid #c3c4c7;
-    border-radius: 4px;
+    border-radius: 0;
     margin-bottom: 15px;
     padding: 15px;
     background: #fff;

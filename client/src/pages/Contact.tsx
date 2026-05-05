@@ -1,9 +1,10 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useSiteSettings } from '../components/SiteSettings/SiteSettingsProvider'
 import { submitContactForm } from '../services/api'
 import AnimatedSection from '../components/AnimatedSection/AnimatedSection'
+import { SEO, BreadcrumbSchema, LocalBusinessSchema } from '../components/SEO/SEO'
 import './Contact.css'
 
 function Contact() {
@@ -55,7 +56,7 @@ function Contact() {
         <title>Contact - Katy Murr</title>
         <meta name="description" content={language === 'en'
           ? 'Get in touch with Katy Murr for English coaching, interpreting, or writing services.'
-          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprétation ou d\'écriture.'
+          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprÃ©tation ou d\'Ã©criture.'
         } />
         <meta name="keywords" content="contact, english coaching, interpreting, writing services" />
         <link rel="canonical" href="https://katymurr.com/contact" />
@@ -63,7 +64,7 @@ function Contact() {
         <meta property="og:title" content="Contact - Katy Murr" />
         <meta property="og:description" content={language === 'en'
           ? 'Get in touch with Katy Murr for English coaching, interpreting, or writing services.'
-          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprétation ou d\'écriture.'
+          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprÃ©tation ou d\'Ã©criture.'
         } />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://katymurr.com/contact" />
@@ -72,9 +73,26 @@ function Contact() {
         <meta name="twitter:title" content="Contact - Katy Murr" />
         <meta name="twitter:description" content={language === 'en'
           ? 'Get in touch with Katy Murr for English coaching, interpreting, or writing services.'
-          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprétation ou d\'écriture.'
+          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprÃ©tation ou d\'Ã©criture.'
         } />
       </Helmet>
+
+      {/* SEO Enhancements */}
+      <SEO
+        title="Contact - Katy Murr"
+        description={language === 'en'
+          ? 'Get in touch with Katy Murr for English coaching, interpreting, or writing services.'
+          : 'Contactez Katy Murr pour des services de coaching en anglais, d\'interprÃ©tation ou d\'Ã©criture.'
+        }
+        type="website"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: 'Contact', url: '/contact' },
+        ]}
+      />
+      <LocalBusinessSchema />
 
       <AnimatedSection animation="fadeInUp">
         <section className="section page-header">
@@ -82,8 +100,8 @@ function Contact() {
             <h1>{language === 'en' ? 'Contact' : 'Contact'}</h1>
           <p className="page-intro">
             {language === 'en'
-              ? 'Get in touch to discuss your project or ask any questions.'
-              : 'Contactez-moi pour discuter de votre projet ou poser des questions.'
+              ? 'Discuss your project, explore collaboration, or learn how I can help you communicate with impact.'
+              : 'Discutez de votre projet, explorez une collaboration ou découvrez comment je peux vous aider à communiquer avec impact.'
             }
           </p>
         </div>
@@ -98,28 +116,28 @@ function Contact() {
               <h2>{language === 'en' ? 'Get in Touch' : 'Contactez-moi'}</h2>
               <p>
                 {language === 'en'
-                  ? 'Feel free to reach out via email or use the contact form. I typically respond within 24-48 hours.'
-                  : 'N\'hésitez pas à me contacter par email ou utilisez le formulaire de contact. Je réponds généralement dans les 24-48 heures.'
+                  ? 'I typically respond within 24-48 hours. Reach me via:'
+                  : 'Je réponds généralement sous 24-48 heures. Vous pouvez me joindre via :'
                 }
               </p>
 
               <div className="contact-details">
                 {contactPhone && (
                   <div className="contact-item">
-                    <strong>Phone:</strong>
+                    <strong>{language === 'en' ? 'Phone:' : 'Téléphone :'}</strong>
                     <a href={`tel:${contactPhone.replace(/\s/g, '')}`}>{contactPhone}</a>
                   </div>
                 )}
                 {contactEmail && (
                   <div className="contact-item">
-                    <strong>Email:</strong>
+                    <strong>{language === 'en' ? 'Email:' : 'E-mail :'}</strong>
                     <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                   </div>
                 )}
               </div>
             </div>
 
-            <form className="contact-form" onSubmit={handleSubmit}>
+            <form id="contact-form" className="contact-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="name">
                   {language === 'en' ? 'Name' : 'Nom'} *
@@ -160,19 +178,19 @@ function Contact() {
                   required
                 >
                   <option value="">
-                    {language === 'en' ? 'Select a service' : 'Sélectionnez un service'}
+                    {language === 'en' ? 'Select a service' : 'SÃ©lectionnez un service'}
                   </option>
                   <option value="english-coaching">
                     {language === 'en' ? 'English Coaching' : 'Coaching en anglais'}
                   </option>
                   <option value="interpreting">
-                    {language === 'en' ? 'Conference Interpreting' : 'Interprétation de conférence'}
+                    {language === 'en' ? 'Conference Interpreting' : 'InterprÃ©tation de confÃ©rence'}
                   </option>
                   <option value="writing-fiction">
-                    {language === 'en' ? 'Writing - Fiction' : 'Écriture - Fiction'}
+                    {language === 'en' ? 'Writing - Fiction' : 'Ã‰criture - Fiction'}
                   </option>
                   <option value="writing-nonfiction">
-                    {language === 'en' ? 'Writing - Non-fiction' : 'Écriture - Non-fiction'}
+                    {language === 'en' ? 'Writing - Non-fiction' : 'Ã‰criture - Non-fiction'}
                   </option>
                   <option value="other">
                     {language === 'en' ? 'Other' : 'Autre'}
@@ -198,7 +216,7 @@ function Contact() {
                 <div className="form-message success">
                   {language === 'en'
                     ? 'Thank you! Your message has been sent successfully.'
-                    : 'Merci ! Votre message a été envoyé avec succès.'
+                    : 'Merci ! Votre message a Ã©tÃ© envoyÃ© avec succÃ¨s.'
                   }
                 </div>
               )}
@@ -207,7 +225,7 @@ function Contact() {
                 <div className="form-message error">
                   {language === 'en'
                     ? 'Sorry, there was an error sending your message. Please try again.'
-                    : 'Désolé, une erreur s\'est produite lors de l\'envoi de votre message. Veuillez réessayer.'
+                    : 'DÃ©solÃ©, une erreur s\'est produite lors de l\'envoi de votre message. Veuillez rÃ©essayer.'
                   }
                 </div>
               )}
@@ -232,4 +250,5 @@ function Contact() {
 }
 
 export default Contact
+
 

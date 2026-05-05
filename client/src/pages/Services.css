@@ -15,10 +15,104 @@
   padding: var(--spacing-xl) 0;
   scroll-margin-top: 120px; /* Espace pour la navbar sticky */
   background-color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
 }
 
 .service-section-alt {
   background-color: var(--color-cream);
+}
+
+/* Service section with background image */
+.service-section-with-bg {
+  background-color: transparent;
+}
+
+.service-bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.service-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.service-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(58, 42, 37, 0.75) 0%,
+    rgba(58, 42, 37, 0.65) 50%,
+    rgba(58, 42, 37, 0.75) 100%
+  );
+  z-index: 1;
+}
+
+.service-section-number {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  font-family: var(--font-secondary), serif;
+  font-size: 12rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+.service-section-with-bg .service-section-number {
+  opacity: 0.15;
+}
+
+.service-section .container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+/* Text colors for sections with background */
+.service-section-with-bg .service-text h2 {
+  color: var(--color-white);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.service-section-with-bg .service-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.service-section-with-bg .service-text p {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.service-section-with-bg .btn-primary {
+  background-color: var(--color-white) !important;
+  color: var(--color-accent) !important;
+  border: none !important;
+}
+
+.service-section-with-bg .btn-primary:hover {
+  background-color: var(--color-cream) !important;
+  color: var(--color-dark) !important;
 }
 
 .service-content {
@@ -31,7 +125,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-.service-description {
+.service-subtitle {
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--color-accent);
@@ -58,7 +152,7 @@
   padding: var(--spacing-sm);
   background-color: var(--color-white);
   border-left: 3px solid var(--color-warm);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .writing-types {
@@ -71,7 +165,7 @@
 .writing-type {
   background-color: var(--color-white);
   padding: var(--spacing-lg);
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -102,7 +196,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem 2.25rem !important;
-  border-radius: 6px !important;
+  border-radius: 0;
   font-weight: 600 !important;
   font-size: 1.1rem !important;
   transition: all var(--transition-normal);
@@ -139,6 +233,17 @@
 }
 
 @media (max-width: 768px) {
+  .service-section {
+    min-height: 350px;
+    padding: var(--spacing-lg) 0;
+  }
+
+  .service-section-number {
+    font-size: 6rem;
+    right: 2%;
+    opacity: 0.08;
+  }
+
   .service-features {
     grid-template-columns: 1fr;
   }

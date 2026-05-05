@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useSiteSettings } from '../SiteSettings/SiteSettingsProvider'
 import LanguageSelector from '../LanguageSelector/LanguageSelector'
@@ -23,25 +23,42 @@ interface MenuItem {
 function Header() {
   const { t, language } = useLanguage()
   const { getSetting } = useSiteSettings()
+  const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const [isScrolled, setIsScrolled] = useState(false)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loadingMenu, setLoadingMenu] = useState(true)
-  
+
+  // Détecter si on est sur la page d'accueil
+  const isHomePage = location.pathname === '/' || location.pathname === ''
+
   const logoUrl = getSetting('logo_url') || '/logo.png'
   const siteName = getSetting('site_name') || 'Katy Murr'
+  const contactEmail = getSetting('contact_email') || 'contact@katymurr.com'
+  const contactPhone = getSetting('contact_phone') || '+41 79 658 56 71'
+  const linkedinUrl = getSetting('social_linkedin') || 'https://www.linkedin.com/in/katymurr'
+  const linkedinAriaLabel = language === 'en' ? 'Visit our LinkedIn page' : 'Voir notre page LinkedIn'
 
   useEffect(() => {
     let ticking = false
+
+    // Seuils avec hystérésis pour éviter le saccadage
+    const SCROLL_DOWN_THRESHOLD = 80  // Déclencher après 80px de scroll vers le bas
+    const SCROLL_UP_THRESHOLD = 40    // Revenir à l'état initial si on remonte au-dessus de 40px
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollPosition = window.scrollY
-          const shouldBeScrolled = scrollPosition > 5
-          
-          setIsScrolled(shouldBeScrolled)
+
+          // Hystérésis : seuils différents pour éviter le basculement rapide
+          if (!isScrolled && scrollPosition > SCROLL_DOWN_THRESHOLD) {
+            setIsScrolled(true)
+          } else if (isScrolled && scrollPosition < SCROLL_UP_THRESHOLD) {
+            setIsScrolled(false)
+          }
+
           ticking = false
         })
         ticking = true
@@ -49,16 +66,16 @@ function Header() {
     }
 
     // Vérifier l'état initial au chargement
-    setIsScrolled(window.scrollY > 5)
+    setIsScrolled(window.scrollY > SCROLL_DOWN_THRESHOLD)
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isScrolled])
 
   // Load menu from API
   useEffect(() => {
     let cancelled = false
-    
+
     const loadMenu = async () => {
       try {
         setLoadingMenu(true)
@@ -78,7 +95,7 @@ function Header() {
       }
     }
     loadMenu()
-    
+
     return () => {
       cancelled = true
     }
@@ -102,19 +119,19 @@ function Header() {
     if (menuItems.length === 0) {
       // Fallback to default menu with services dropdown
       const isServicesDropdownOpen = openDropdownId === 'services-fallback'
-      
+
       return (
         <>
           <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
             {t('nav.home')}
           </Link>
 
-          <div 
+          <div
             className="nav-dropdown"
             onMouseEnter={() => setOpenDropdownId('services-fallback')}
             onMouseLeave={() => setOpenDropdownId(null)}
           >
-            <button 
+            <button
               className="nav-link nav-dropdown-toggle"
               onMouseEnter={() => setOpenDropdownId('services-fallback')}
               onClick={(e) => {
@@ -125,24 +142,29 @@ function Header() {
               {t('nav.services')} <HiChevronDown className="dropdown-icon" />
             </button>
             {isServicesDropdownOpen && (
-              <div 
+              <div
                 className="nav-dropdown-menu"
                 onMouseEnter={() => setOpenDropdownId('services-fallback')}
                 onMouseLeave={() => setOpenDropdownId(null)}
               >
                 <Link to="/services/english-coaching" onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}>
+                  <span className="dropdown-number">01</span>
                   {t('services.english-coaching')}
                 </Link>
                 <Link to="/services/conference-interpreting" onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}>
+                  <span className="dropdown-number">02</span>
                   {t('services.interpreting')}
                 </Link>
                 <Link to="/services/creative-solutions" onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}>
+                  <span className="dropdown-number">03</span>
                   {language === 'en' ? 'Creative Solutions' : 'Solutions créatives'}
                 </Link>
                 <Link to="/services/translation-proofreading" onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}>
+                  <span className="dropdown-number">04</span>
                   {language === 'en' ? 'Translation & Proofreading' : 'Traduction & Correction'}
                 </Link>
                 <Link to="/services/writing" onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}>
+                  <span className="dropdown-number">05</span>
                   {language === 'en' ? 'Writing' : 'Écriture'}
                 </Link>
               </div>
@@ -170,19 +192,19 @@ function Header() {
 
     return topLevelItems.map((item) => {
       const label = language === 'en' ? item.label_en : item.label_fr
-      
+
       if (item.type === 'dropdown' || item.type === 'service') {
         const childItems = menuItems.filter(child => child.parent_id === item.id && child.visible)
         const isOpen = openDropdownId === item.id
-        
+
         return (
-          <div 
+          <div
             key={item.id}
             className="nav-dropdown"
             onMouseEnter={() => setOpenDropdownId(item.id)}
             onMouseLeave={() => setOpenDropdownId(null)}
           >
-            <button 
+            <button
               className="nav-link nav-dropdown-toggle"
               onMouseEnter={() => setOpenDropdownId(item.id)}
               onClick={(e) => {
@@ -193,35 +215,38 @@ function Header() {
               {label} <HiChevronDown className="dropdown-icon" />
             </button>
             {isOpen && childItems.length > 0 && (
-              <div 
+              <div
                 className="nav-dropdown-menu"
                 onMouseEnter={() => setOpenDropdownId(item.id)}
                 onMouseLeave={() => setOpenDropdownId(null)}
               >
-                {childItems.map((child) => {
+                {childItems.map((child, index) => {
                   const childLabel = language === 'en' ? child.label_en : child.label_fr
                   const url = child.url || '#'
-                  
+                  const number = (index + 1).toString().padStart(2, '0')
+
                   if (url.startsWith('http')) {
                     return (
-                      <a 
+                      <a
                         key={child.id}
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}
                       >
+                        <span className="dropdown-number">{number}</span>
                         {childLabel}
                       </a>
                     )
                   }
-                  
+
                   return (
-                    <Link 
+                    <Link
                       key={child.id}
                       to={url}
                       onClick={() => { setIsMenuOpen(false); setOpenDropdownId(null); }}
                     >
+                      <span className="dropdown-number">{number}</span>
                       {childLabel}
                     </Link>
                   )
@@ -233,7 +258,7 @@ function Header() {
       }
 
       const url = item.url || '#'
-      
+
       if (url.startsWith('http')) {
         return (
           <a
@@ -265,15 +290,16 @@ function Header() {
   const navLinks = <>{renderMenuItems()}</>
 
   return (
-    <header className={`header ${isScrolled ? 'header-scrolled' : ''}`}>
+    <header className={`header ${isScrolled ? 'header-scrolled' : ''} ${isHomePage ? 'header-home' : ''}`}>
       <div className="container">
         {/* État initial : Logo centré en haut, menu en dessous (desktop uniquement) */}
         <div className={`header-content header-content-top ${isScrolled ? 'header-content-hidden' : ''}`}>
           <div className="header-top">
-            <Link to="/" className="logo logo-centered">
+            <Link to="/" className="logo logo-centered logo-with-tagline">
               <img src={logoUrl} alt={siteName} className="logo-image" />
+              <span className="logo-tagline">Conference Interpreter &amp; Executive English Coach</span>
             </Link>
-            <button 
+            <button
               className="menu-toggle menu-toggle-top"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
@@ -288,20 +314,56 @@ function Header() {
               {navLinks}
             </nav>
             <div className="header-actions-top">
+              <a href={`tel:${contactPhone}`} className="contact-btn" aria-label="Call us">
+                <i className="fas fa-phone"></i>
+              </a>
+              <a href={`mailto:${contactEmail}`} className="contact-btn" aria-label="Email us">
+                <i className="fas fa-envelope"></i>
+              </a>
+              <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-btn"
+                aria-label={linkedinAriaLabel}
+              >
+                <i className="fab fa-linkedin-in"></i>
+              </a>
               <LanguageSelector />
             </div>
           </div>
           {/* Layout mobile - toujours visible mais masqué sur desktop */}
           <div className="header-mobile">
-            <Link to="/" className="logo logo-mobile">
+            <Link to="/" className="logo logo-mobile logo-with-tagline">
               <img src={logoUrl} alt={siteName} className="logo-image" />
+              <span className="logo-tagline">Conference Interpreter &amp; Executive English Coach</span>
             </Link>
             <nav className={`nav nav-mobile ${isMenuOpen ? 'nav-open' : ''}`}>
               {navLinks}
+              <div className="mobile-language-selector">
+                <LanguageSelector />
+              </div>
             </nav>
             <div className="header-actions header-actions-mobile">
-              <LanguageSelector />
-              <button 
+              <a href={`tel:${contactPhone}`} className="contact-btn" aria-label="Call us">
+                <i className="fas fa-phone"></i>
+              </a>
+              <a href={`mailto:${contactEmail}`} className="contact-btn" aria-label="Email us">
+                <i className="fas fa-envelope"></i>
+              </a>
+              <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-btn"
+                aria-label={linkedinAriaLabel}
+              >
+                <i className="fab fa-linkedin-in"></i>
+              </a>
+              <div className="desktop-language-selector">
+                <LanguageSelector />
+              </div>
+              <button
                 className="menu-toggle menu-toggle-mobile"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle menu"
@@ -322,11 +384,31 @@ function Header() {
 
           <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
             {navLinks}
+            <div className="mobile-language-selector">
+              <LanguageSelector />
+            </div>
           </nav>
 
           <div className="header-actions">
-            <LanguageSelector />
-            <button 
+            <a href={`tel:${contactPhone}`} className="contact-btn" aria-label="Call us">
+              <i className="fas fa-phone"></i>
+            </a>
+            <a href={`mailto:${contactEmail}`} className="contact-btn" aria-label="Email us">
+              <i className="fas fa-envelope"></i>
+            </a>
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-btn"
+              aria-label={linkedinAriaLabel}
+            >
+              <i className="fab fa-linkedin-in"></i>
+            </a>
+            <div className="desktop-language-selector">
+              <LanguageSelector />
+            </div>
+            <button
               className="menu-toggle"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
@@ -343,4 +425,3 @@ function Header() {
 }
 
 export default Header
-

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminBlogPosts, createAdminBlogPost, updateAdminBlogPost } from '../../services/api'
 import './AdminBlog.css'
 import './AdminForms.css'
 
@@ -17,19 +18,6 @@ interface BlogPost {
   meta_description: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchBlogPosts() {
-  const response = await fetch(`${API_BASE_URL}/admin/blog`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch blog posts')
-  return response.json()
-}
-
 function AdminBlog() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,7 +30,7 @@ function AdminBlog() {
   const loadPosts = async () => {
     try {
       setLoading(true)
-      const data = await fetchBlogPosts()
+      const data = await fetchAdminBlogPosts()
       setPosts(data)
     } catch (error) {
       console.error('Error loading blog posts:', error)
@@ -149,22 +137,11 @@ function BlogPostEditor({ post, onSave, onCancel }: { post: BlogPost, onSave: ()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const url = post.id
-        ? `${API_BASE_URL}/admin/blog/${post.id}`
-        : `${API_BASE_URL}/admin/blog`
-      
-      const method = post.id ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) throw new Error('Failed to save post')
+      if (post.id) {
+        await updateAdminBlogPost(post.id, formData)
+      } else {
+        await createAdminBlogPost(formData)
+      }
       onSave()
     } catch (error) {
       console.error('Error saving post:', error)
@@ -173,13 +150,21 @@ function BlogPostEditor({ post, onSave, onCancel }: { post: BlogPost, onSave: ()
   }
 
   return (
-    <form className="post-editor" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label>Title</label>
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+    <div className="editor-overlay">
+      <div className="editor-container editor-large">
+        <div className="editor-header">
+          <h3>{post.id ? 'Edit Blog Post' : 'Add New Blog Post'}</h3>
+          <button className="editor-close" onClick={onCancel} type="button">
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="editor-form">
+          <div className="form-group">
+            <label>Title</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
         />
       </div>
@@ -262,11 +247,13 @@ function BlogPostEditor({ post, onSave, onCancel }: { post: BlogPost, onSave: ()
         />
       </div>
 
-      <div className="form-actions">
-        <button type="submit" className="btn btn-primary">Save</button>
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   )
 }
 

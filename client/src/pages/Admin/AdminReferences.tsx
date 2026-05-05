@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminReferences, createAdminReference, updateAdminReference, fetchAdminMedia } from '../../services/api'
+import { supabase } from '../../utils/supabase'
 import './AdminReferences.css'
 import './AdminForms.css'
 
@@ -15,18 +17,7 @@ interface Reference {
   featured: boolean
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchReferences() {
-  const response = await fetch(`${API_BASE_URL}/admin/references`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch references')
-  return response.json()
-}
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 function AdminReferences() {
   const [references, setReferences] = useState<Reference[]>([])
@@ -40,7 +31,7 @@ function AdminReferences() {
   const loadReferences = async () => {
     try {
       setLoading(true)
-      const data = await fetchReferences()
+      const data = await fetchAdminReferences()
       setReferences(data)
     } catch (error) {
       console.error('Error loading references:', error)
@@ -147,13 +138,7 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
 
   const loadMedia = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/media`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to fetch media')
-      const data = await response.json()
+      const data = await fetchAdminMedia()
       setMedia(data)
     } catch (error) {
       console.error('Error loading media:', error)
@@ -168,8 +153,15 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
       uploadFormData.append('category', 'logos')
       uploadFormData.append('alt_text', `Logo for ${formData.institution || 'institution'}`)
 
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        alert('Not authenticated')
+        setUploading(false)
+        return
+      }
+
       const xhr = new XMLHttpRequest()
-      
+
       xhr.upload.addEventListener('progress', () => {
         // Progress handled by UI
       })
@@ -193,7 +185,7 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
       })
 
       xhr.open('POST', `${API_BASE_URL}/upload`)
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`)
       xhr.send(uploadFormData)
     } catch (error) {
       console.error('Error uploading file:', error)
@@ -205,22 +197,11 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const url = reference.id
-        ? `${API_BASE_URL}/admin/references/${reference.id}`
-        : `${API_BASE_URL}/admin/references`
-      
-      const method = reference.id ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) throw new Error('Failed to save reference')
+      if (reference.id) {
+        await updateAdminReference(reference.id, formData)
+      } else {
+        await createAdminReference(formData)
+      }
       onSave()
     } catch (error) {
       console.error('Error saving reference:', error)
@@ -229,15 +210,15 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
   }
 
   return (
-    <div className="admin-form-container">
-      <div className="admin-form-header">
-        <h2>{reference.id ? '✏️ Edit Reference' : '➕ Add New Reference'}</h2>
-        <p className="form-description">
-          {reference.id ? 'Update the reference information below.' : 'Create a new reference by filling in the details below.'}
-        </p>
-      </div>
-      <div className="admin-form-body">
-        <form onSubmit={handleSubmit}>
+    <div className="editor-overlay">
+      <div className="editor-container editor-large">
+        <div className="editor-header">
+          <h3>{reference.id ? 'Edit Reference' : 'Add New Reference'}</h3>
+          <button className="editor-close" onClick={onCancel} type="button">
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="editor-form">
           {/* Basic Information Section */}
           <div className="form-section">
             <h3 className="form-section-title">👤 Reference Information</h3>
@@ -425,12 +406,12 @@ function ReferenceEditor({ reference, onSave, onCancel }: { reference: Reference
             </div>
           </div>
 
-          <div className="form-actions">
-            <button type="button" className="button button-secondary" onClick={onCancel}>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button type="submit" className="button button-primary">
-              {reference.id ? '💾 Update Reference' : '✨ Create Reference'}
+            <button type="submit" className="btn btn-primary">
+              {reference.id ? 'Update Reference' : 'Create Reference'}
             </button>
           </div>
         </form>

@@ -14,6 +14,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts'
+import { fetchAdminAnalytics } from '../../services/api'
 import './AdminAnalytics.css'
 
 interface AnalyticsStats {
@@ -23,23 +24,6 @@ interface AnalyticsStats {
   visits_by_date: { date: string; count: number }[]
   visits_by_country: { country: string; count: number }[]
   average_duration: number
-}
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchAnalytics(startDate?: string, endDate?: string) {
-  const params = new URLSearchParams()
-  if (startDate) params.append('start_date', startDate)
-  if (endDate) params.append('end_date', endDate)
-
-  const response = await fetch(`${API_BASE_URL}/admin/analytics/stats?${params}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch analytics')
-  return response.json()
 }
 
 function AdminAnalytics() {
@@ -56,7 +40,10 @@ function AdminAnalytics() {
   const loadAnalytics = async () => {
     try {
       setLoading(true)
-      const data = await fetchAnalytics(startDate || undefined, endDate || undefined)
+      const params: any = {}
+      if (startDate) params.start_date = startDate
+      if (endDate) params.end_date = endDate
+      const data = await fetchAdminAnalytics(params)
       setStats(data)
     } catch (error) {
       console.error('Error loading analytics:', error)

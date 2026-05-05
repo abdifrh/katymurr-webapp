@@ -6,6 +6,7 @@ import { useSiteSettings } from '../components/SiteSettings/SiteSettingsProvider
 import { fetchBlogPosts, fetchCategories } from '../services/api'
 import Loader from '../components/Loader/Loader'
 import AnimatedSection from '../components/AnimatedSection/AnimatedSection'
+import { SEO, BreadcrumbSchema } from '../components/SEO/SEO'
 import './Blog.css'
 
 interface BlogPost {
@@ -72,6 +73,19 @@ function Blog() {
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
       </Helmet>
+
+      {/* SEO Enhancements */}
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        type="website"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: language === 'en' ? 'Blog' : 'Journal', url: '/blog' },
+        ]}
+      />
 
       <div className="blog-page">
         <AnimatedSection animation="fadeInUp">

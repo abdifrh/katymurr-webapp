@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminServices, createAdminService, updateAdminService, deleteAdminService, fetchAdminMedia } from '../../services/api'
+import { supabase } from '../../utils/supabase'
 import './AdminServices.css'
 import './AdminForms.css'
 
@@ -21,19 +23,6 @@ interface Service {
   meta_keywords?: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchServices() {
-  const response = await fetch(`${API_BASE_URL}/admin/services`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch services')
-  return response.json()
-}
-
 function AdminServices() {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,7 +35,7 @@ function AdminServices() {
   const loadServices = async () => {
     try {
       setLoading(true)
-      const data = await fetchServices()
+      const data = await fetchAdminServices()
       setServices(data)
     } catch (error) {
       console.error('Error loading services:', error)
@@ -57,15 +46,9 @@ function AdminServices() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this service?')) return
-    
+
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/services/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to delete service')
+      await deleteAdminService(id)
       loadServices()
     } catch (error) {
       console.error('Error deleting service:', error)
@@ -228,6 +211,68 @@ function ServiceEditor({ service, onSave, onCancel }: { service: Service, onSave
     meta_description: service.meta_description || '',
     meta_keywords: service.meta_keywords || '',
   })
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false)
+  const [media, setMedia] = useState<any[]>([])
+  const [uploading, setUploading] = useState(false)
+
+  const loadMedia = async () => {
+    try {
+      const data = await fetchAdminMedia()
+      setMedia(data)
+    } catch (error) {
+      console.error('Error loading media:', error)
+    }
+  }
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      setUploading(true)
+
+      // Get token from Supabase session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+      uploadFormData.append('category', 'media')
+      uploadFormData.append('alt_text', `Image for ${formData.title || 'service'}`)
+
+      const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+      const xhr = new XMLHttpRequest()
+
+      xhr.upload.addEventListener('progress', () => {
+        // Progress handled by UI
+      })
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText)
+          setFormData({ ...formData, featured_image: response.url })
+          setUploading(false)
+          loadMedia() // Refresh media library
+        } else {
+          const error = JSON.parse(xhr.responseText)
+          alert(`Upload failed: ${error.error || 'Unknown error'}`)
+          setUploading(false)
+        }
+      })
+
+      xhr.addEventListener('error', () => {
+        alert('Upload failed. Please check your connection and try again.')
+        setUploading(false)
+      })
+
+      xhr.open('POST', `${API_BASE_URL}/upload`)
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`)
+      xhr.send(uploadFormData)
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      alert('Failed to upload file')
+      setUploading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -237,25 +282,17 @@ function ServiceEditor({ service, onSave, onCancel }: { service: Service, onSave
         sections: sections
       }
 
-      const url = service.id
-        ? `${API_BASE_URL}/admin/services/${service.id}`
-        : `${API_BASE_URL}/admin/services`
-      
-      const method = service.id ? 'PUT' : 'POST'
+      const serviceData = {
+        ...formData,
+        content: contentData,
+      }
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          content: contentData,
-        }),
-      })
+      if (service.id) {
+        await updateAdminService(service.id, serviceData)
+      } else {
+        await createAdminService(serviceData)
+      }
 
-      if (!response.ok) throw new Error('Failed to save service')
       onSave()
     } catch (error) {
       console.error('Error saving service:', error)
@@ -264,12 +301,15 @@ function ServiceEditor({ service, onSave, onCancel }: { service: Service, onSave
   }
 
   return (
-    <div className="wp-admin-postbox">
-      <div className="postbox-header">
-        <h2>{service.id ? 'Edit Service' : 'Add New Service'}</h2>
-      </div>
-      <div className="inside">
-        <form onSubmit={handleSubmit}>
+    <div className="editor-overlay">
+      <div className="editor-container editor-large">
+        <div className="editor-header">
+          <h3>{service.id ? 'Edit Service' : 'Add New Service'}</h3>
+          <button className="editor-close" onClick={onCancel} type="button">
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="editor-form">
           <div className="form-field">
             <label>Slug *</label>
             <input
@@ -531,13 +571,92 @@ function ServiceEditor({ service, onSave, onCancel }: { service: Service, onSave
           </div>
 
           <div className="form-field">
-            <label>Featured Image URL</label>
-            <input
-              type="text"
-              className="regular-text"
-              value={formData.featured_image}
-              onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-            />
+            <label>Featured Image</label>
+            <p className="description">This image will be used as background in the service detail page header.</p>
+            <div className="image-upload-field">
+              {formData.featured_image ? (
+                <div className="image-preview-container has-image">
+                  <img src={formData.featured_image} alt="Service preview" />
+                  <div className="image-preview-actions">
+                    <button
+                      type="button"
+                      className="button-link"
+                      onClick={() => setFormData({ ...formData, featured_image: '' })}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="image-preview-container">
+                  <p style={{ textAlign: 'center', color: '#646970', padding: '20px' }}>
+                    No image selected
+                  </p>
+                </div>
+              )}
+
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Or enter image URL directly"
+                  value={formData.featured_image}
+                  onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={() => {
+                    setShowMediaLibrary(!showMediaLibrary)
+                    if (!showMediaLibrary) loadMedia()
+                  }}
+                >
+                  {showMediaLibrary ? 'Hide Library' : '📚 Media Library'}
+                </button>
+                <label className="image-upload-button">
+                  {uploading ? '⏳ Uploading...' : '📤 Upload Image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleFileUpload(file)
+                    }}
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+              {showMediaLibrary && (
+                <div className="media-library">
+                  <div className="media-library-header">
+                    <h3>Select Image</h3>
+                    <button
+                      type="button"
+                      className="button-link"
+                      onClick={() => setShowMediaLibrary(false)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="media-grid">
+                    {media.filter(m => m.mime_type?.startsWith('image/')).map((item) => (
+                      <div
+                        key={item.id}
+                        className={`media-item ${formData.featured_image === item.url ? 'selected' : ''}`}
+                        onClick={() => {
+                          setFormData({ ...formData, featured_image: item.url })
+                          setShowMediaLibrary(false)
+                        }}
+                      >
+                        <img src={item.url} alt={item.alt_text || item.filename} />
+                        <div className="media-item-info">
+                          <span>{item.original_filename}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-field">
@@ -601,9 +720,9 @@ function ServiceEditor({ service, onSave, onCancel }: { service: Service, onSave
             />
           </div>
 
-          <div className="form-actions">
-            <button type="submit" className="button button-primary">Save Service</button>
-            <button type="button" className="button" onClick={onCancel}>Cancel</button>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Service</button>
           </div>
         </form>
       </div>

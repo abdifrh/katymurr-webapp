@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useSiteSettings } from '../components/SiteSettings/SiteSettingsProvider'
-import { fetchService } from '../services/api'
+import { fetchService, fetchServices } from '../services/api'
 import Loader from '../components/Loader/Loader'
+import { SEO, BreadcrumbSchema, ServiceSchema } from '../components/SEO/SEO'
 import './ServiceDetail.css'
 
 interface ServiceContent {
@@ -32,6 +33,7 @@ interface Service {
   language: string
   featured_image?: string
   icon?: string
+  order_index: number
   meta_title?: string
   meta_description?: string
   meta_keywords?: string
@@ -42,21 +44,34 @@ function ServiceDetail() {
   const { language } = useLanguage()
   const { getSetting } = useSiteSettings()
   const [service, setService] = useState<Service | null>(null)
+  const [serviceNumber, setServiceNumber] = useState<string>('01')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+
   const contactEmail = getSetting('contact_email') || 'contact@katymurr.com'
   const contactPhone = getSetting('contact_phone') || '+41 79 658 56 71'
 
   useEffect(() => {
     const loadService = async () => {
       if (!slug) return
-      
+
       try {
         setLoading(true)
         setError(null)
-        const data = await fetchService(slug, language)
-        setService(data)
+
+        // Charger le service actuel et tous les services pour obtenir le numéro
+        const [serviceData, allServices] = await Promise.all([
+          fetchService(slug, language),
+          fetchServices(language, true)
+        ])
+
+        setService(serviceData)
+
+        // Trouver l'index du service actuel dans la liste triée
+        const sortedServices = allServices.sort((a: Service, b: Service) => a.order_index - b.order_index)
+        const index = sortedServices.findIndex((s: Service) => s.id === serviceData.id)
+        const number = (index + 1).toString().padStart(2, '0')
+        setServiceNumber(number)
       } catch (err: any) {
         console.error('Error loading service:', err)
         setError(err.message || 'Service not found')
@@ -197,8 +212,38 @@ function ServiceDetail() {
         )}
       </Helmet>
 
+      {/* SEO Enhancements */}
+      <SEO
+        title={service.meta_title || service.title}
+        description={service.meta_description || service.description || ''}
+        image={service.featured_image}
+        type="website"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: 'Services', url: '/services' },
+          { name: service.title, url: `/services/${service.slug}` },
+        ]}
+      />
+      <ServiceSchema
+        name={service.title}
+        description={service.meta_description || service.description || ''}
+        url={`/services/${service.slug}`}
+        image={service.featured_image}
+      />
+
       <div className="service-detail-page">
         <section className="section service-header">
+          {service.featured_image && (
+            <>
+              <div className="service-hero-background">
+                <img src={service.featured_image} alt={service.title} className="service-hero-image" />
+                <div className="service-hero-overlay"></div>
+              </div>
+              <span className="service-hero-number">{serviceNumber}</span>
+            </>
+          )}
           <div className="container">
             <Link to="/services" className="back-link">
               ← {language === 'en' ? 'Back to Services' : 'Retour aux services'}
@@ -208,14 +253,6 @@ function ServiceDetail() {
             {service.description && <p className="service-description">{service.description}</p>}
           </div>
         </section>
-
-        {service.featured_image && (
-          <section className="section service-image-section">
-            <div className="container">
-              <img src={service.featured_image} alt={service.title} className="service-featured-image" />
-            </div>
-          </section>
-        )}
 
         <section className="section service-content-section">
           <div className="container">

@@ -15,9 +15,9 @@ function Loader({ size = 'medium', text, fullScreen = false }: LoaderProps) {
     <div className={`loader-container ${fullScreen ? 'loader-fullscreen' : ''}`}>
       <div className="loader-wrapper">
         <div className={`loader-spinner loader-${size}`}>
-          <div className="spinner-ring"></div>
-          <div className="spinner-ring"></div>
-          <div className="spinner-ring"></div>
+          <div className="spinner-square"></div>
+          <div className="spinner-square"></div>
+          <div className="spinner-square"></div>
         </div>
         <p className="loader-text">{displayText}</p>
       </div>

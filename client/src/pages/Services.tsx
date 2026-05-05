@@ -6,6 +6,7 @@ import { useSiteSettings } from '../components/SiteSettings/SiteSettingsProvider
 import { fetchServices } from '../services/api'
 import Loader from '../components/Loader/Loader'
 import AnimatedSection from '../components/AnimatedSection/AnimatedSection'
+import { SEO, BreadcrumbSchema } from '../components/SEO/SEO'
 import './Services.css'
 
 interface Service {
@@ -15,6 +16,7 @@ interface Service {
   subtitle?: string
   description?: string
   icon?: string
+  featured_image?: string
   order_index: number
 }
 
@@ -85,6 +87,19 @@ function Services() {
         <meta name="twitter:description" content={seoDescription} />
       </Helmet>
 
+      {/* SEO Enhancements */}
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        type="website"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: 'Services', url: '/services' },
+        ]}
+      />
+
       <div className="services-page">
         <AnimatedSection animation="fadeInUp">
           <section className="section page-header">
@@ -107,21 +122,32 @@ function Services() {
         ) : (
           <>
             {services.map((service, index) => (
-              <AnimatedSection 
+              <AnimatedSection
                 key={service.id}
                 animation={index % 2 === 0 ? 'fadeInLeft' : 'fadeInRight'}
                 delay={index * 0.1}
               >
-                <section 
-                  id={service.slug} 
-                  className={`section service-section ${index % 2 === 0 ? 'service-section-alt' : ''}`}
+                <section
+                  id={service.slug}
+                  className={`section service-section ${service.featured_image ? 'service-section-with-bg' : ''}`}
                 >
+                  {service.featured_image && (
+                    <div className="service-bg-wrapper">
+                      <img
+                        src={service.featured_image}
+                        alt={service.title}
+                        className="service-bg-image"
+                      />
+                      <div className="service-bg-overlay"></div>
+                    </div>
+                  )}
+                  <span className="service-section-number">{(index + 1).toString().padStart(2, '0')}</span>
                   <div className="container">
                     <div className="service-content">
                       <div className="service-text">
                         <h2>{service.title}</h2>
                         {service.subtitle && (
-                          <p className="service-description">{service.subtitle}</p>
+                          <p className="service-subtitle">{service.subtitle}</p>
                         )}
                         {service.description && (
                           <p>{service.description}</p>

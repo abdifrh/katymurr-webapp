@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { fetchAdminMedia, deleteAdminMedia } from '../../services/api'
+import { supabase } from '../../utils/supabase'
 import './AdminMedia.css'
 
 interface Media {
@@ -12,18 +14,7 @@ interface Media {
   created_at: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchMedia() {
-  const response = await fetch(`${API_BASE_URL}/admin/media`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch media')
-  return response.json()
-}
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 function AdminMedia() {
   const [media, setMedia] = useState<Media[]>([])
@@ -39,7 +30,7 @@ function AdminMedia() {
   const loadMedia = async () => {
     try {
       setLoading(true)
-      const data = await fetchMedia()
+      const data = await fetchAdminMedia()
       setMedia(data)
     } catch (error: any) {
       console.error('Error loading media:', error)
@@ -53,16 +44,9 @@ function AdminMedia() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this media item? This will also delete the file from storage.')) return
-    
+
     try {
-      // Delete from storage and database
-      const response = await fetch(`${API_BASE_URL}/upload/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to delete media')
+      await deleteAdminMedia(id)
       loadMedia()
     } catch (error) {
       console.error('Error deleting media:', error)
@@ -84,6 +68,13 @@ function AdminMedia() {
     setUploadProgress(0)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        alert('Not authenticated')
+        setUploading(false)
+        return
+      }
+
       const formData = new FormData()
       formData.append('file', file)
       formData.append('category', uploadCategory)
@@ -130,7 +121,7 @@ function AdminMedia() {
       })
 
       xhr.open('POST', `${API_BASE_URL}/upload`)
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`)
       xhr.send(formData)
     } catch (error) {
       console.error('Error uploading media:', error)

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
 import { fetchBlogPost } from '../services/api'
 import Loader from '../components/Loader/Loader'
+import { SEO, BreadcrumbSchema, ArticleSchema } from '../components/SEO/SEO'
 import './BlogPost.css'
 
 interface BlogPost {
@@ -84,6 +85,34 @@ function BlogPost() {
           <meta name="twitter:image" content={post.featured_image.startsWith('http') ? post.featured_image : `https://katymurr.com${post.featured_image}`} />
         )}
       </Helmet>
+
+      {/* SEO Enhancements */}
+      <SEO
+        title={post.meta_title || post.title}
+        description={post.meta_description || post.excerpt || post.title}
+        image={post.featured_image}
+        type="article"
+        article={{
+          publishedTime: post.created_at,
+          author: post.author || 'Katy Murr',
+          category: post.category,
+        }}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: 'Blog', url: '/blog' },
+          { name: post.title, url: `/blog/${post.slug}` },
+        ]}
+      />
+      <ArticleSchema
+        headline={post.title}
+        description={post.meta_description || post.excerpt || post.title}
+        url={`/blog/${post.slug}`}
+        image={post.featured_image}
+        datePublished={post.created_at}
+        category={post.category}
+      />
 
       <div className="blog-post-page">
         <article className="blog-post">

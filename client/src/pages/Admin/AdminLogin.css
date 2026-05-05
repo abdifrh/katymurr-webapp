@@ -15,7 +15,7 @@
   width: 100%;
   max-width: 400px;
   padding: 30px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .login-header {
@@ -31,7 +31,7 @@
 }
 
 .login-logo {
-  color: #9A4818;
+  color: #C19A6B;
   text-decoration: none;
   font-size: 24px;
   font-weight: 400;
@@ -84,15 +84,15 @@
   color: #2c3338;
   background-color: #fff;
   border: 1px solid #8c8f94;
-  border-radius: 4px;
+  border-radius: 0;
   box-shadow: 0 0 0 transparent;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   box-sizing: border-box;
 }
 
 .input:focus {
-  border-color: #9A4818;
-  box-shadow: 0 0 0 1px #9A4818;
+  border-color: #C19A6B;
+  box-shadow: 0 0 0 1px #C19A6B;
   outline: 2px solid transparent;
 }
 
@@ -129,15 +129,15 @@
   cursor: pointer;
   border-width: 1px;
   border-style: solid;
-  border-radius: 3px;
+  border-radius: 0;
   white-space: nowrap;
   box-sizing: border-box;
   transition: all 0.2s;
 }
 
 .button-primary {
-  background: #9A4818;
-  border-color: #9A4818;
+  background: #C19A6B;
+  border-color: #C19A6B;
   color: #fff;
   text-shadow: none;
   width: 100%;
@@ -153,7 +153,7 @@
   background: #135e96;
   border-color: #135e96;
   color: #fff;
-  box-shadow: 0 0 0 1px #fff, 0 0 0 3px #9A4818;
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px #C19A6B;
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
@@ -182,7 +182,7 @@
 }
 
 .back-to-site:hover {
-  color: #9A4818;
+  color: #C19A6B;
 }
 
 @media (max-width: 782px) {

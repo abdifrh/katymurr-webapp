@@ -16,8 +16,8 @@ INSERT INTO pages (slug, title, content, language, meta_title, meta_description,
     </div>
   </div>
   <div class="cta-section-content">
-    <h2>Ready to improve your communication?</h2>
-    <p>Let''s work together to achieve your language and communication goals. Get in touch to discuss your project.</p>
+    <h2>Ready to communicate with confidence and influence?</h2>
+    <p>Get in touch to discuss your project and start making an impact.</p>
     <div class="cta-actions">
       <a href="/contact" class="btn btn-primary">Get in Touch</a>
       <a href="/services" class="btn btn-secondary">View Services</a>
@@ -41,10 +41,10 @@ INSERT INTO pages (slug, title, content, language, meta_title, meta_description,
     </div>
   </div>
   <div class="cta-section-content">
-    <h2>Prêt à améliorer votre communication ?</h2>
-    <p>Travaillons ensemble pour atteindre vos objectifs linguistiques et de communication. Contactez-moi pour discuter de votre projet.</p>
+    <h2>Prêt à communiquer avec confiance et influence ?</h2>
+    <p>Contactez-nous pour discuter de votre projet et commencer à avoir un impact.</p>
     <div class="cta-actions">
-      <a href="/contact" class="btn btn-primary">Contactez-moi</a>
+      <a href="/contact" class="btn btn-primary">Contactez-nous</a>
       <a href="/services" class="btn btn-secondary">Voir les services</a>
     </div>
   </div>',
@@ -197,4 +197,3 @@ DO UPDATE SET
   meta_description = EXCLUDED.meta_description,
   meta_keywords = EXCLUDED.meta_keywords,
   updated_at = NOW();
-

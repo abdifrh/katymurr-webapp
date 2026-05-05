@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminMenu, createAdminMenuItem, updateAdminMenuItem, deleteAdminMenuItem } from '../../services/api'
 import './AdminMenu.css'
+import './AdminForms.css'
 
 interface MenuItem {
   id?: string
@@ -14,20 +16,6 @@ interface MenuItem {
   language: string
   visible: boolean
   icon?: string
-}
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchMenuItems(lang?: string) {
-  const url = lang ? `${API_BASE_URL}/admin/menu?lang=${lang}` : `${API_BASE_URL}/admin/menu`
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch menu items')
-  return response.json()
 }
 
 function AdminMenu() {
@@ -43,7 +31,7 @@ function AdminMenu() {
   const loadMenuItems = async () => {
     try {
       setLoading(true)
-      const data = await fetchMenuItems(selectedLang)
+      const data = await fetchAdminMenu(selectedLang)
       setMenuItems(data)
     } catch (error) {
       console.error('Error loading menu items:', error)
@@ -54,15 +42,9 @@ function AdminMenu() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this menu item?')) return
-    
+
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/menu/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to delete menu item')
+      await deleteAdminMenuItem(id)
       loadMenuItems()
     } catch (error) {
       console.error('Error deleting menu item:', error)
@@ -208,22 +190,11 @@ function MenuEditor({ item, menuItems, onSave, onCancel }: { item: MenuItem, men
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const url = item.id
-        ? `${API_BASE_URL}/admin/menu/${item.id}`
-        : `${API_BASE_URL}/admin/menu`
-      
-      const method = item.id ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) throw new Error('Failed to save menu item')
+      if (item.id) {
+        await updateAdminMenuItem(item.id, formData)
+      } else {
+        await createAdminMenuItem(formData)
+      }
       onSave()
     } catch (error) {
       console.error('Error saving menu item:', error)
@@ -232,12 +203,15 @@ function MenuEditor({ item, menuItems, onSave, onCancel }: { item: MenuItem, men
   }
 
   return (
-    <div className="wp-admin-postbox">
-      <div className="postbox-header">
-        <h2>{item.id ? 'Edit Menu Item' : 'Add New Menu Item'}</h2>
-      </div>
-      <div className="inside">
-        <form onSubmit={handleSubmit}>
+    <div className="editor-overlay">
+      <div className="editor-container">
+        <div className="editor-header">
+          <h3>{item.id ? 'Edit Menu Item' : 'Add New Menu Item'}</h3>
+          <button className="editor-close" onClick={onCancel} type="button">
+            ×
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="editor-form">
           <div className="form-field">
             <label>Label (English) *</label>
             <input
@@ -344,9 +318,9 @@ function MenuEditor({ item, menuItems, onSave, onCancel }: { item: MenuItem, men
             />
           </div>
 
-          <div className="form-actions">
-            <button type="submit" className="button button-primary">Save Menu Item</button>
-            <button type="button" className="button" onClick={onCancel}>Cancel</button>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Save Menu Item</button>
           </div>
         </form>
       </div>

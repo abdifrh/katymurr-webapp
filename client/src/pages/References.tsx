@@ -6,6 +6,7 @@ import { fetchReferences } from '../services/api'
 import ReferenceCard from '../components/ReferenceCard/ReferenceCard'
 import Loader from '../components/Loader/Loader'
 import AnimatedSection from '../components/AnimatedSection/AnimatedSection'
+import LogoCarousel from '../components/LogoCarousel/LogoCarousel'
 import './References.css'
 
 interface Reference {
@@ -163,10 +164,33 @@ function References() {
             </section>
           </AnimatedSection>
         )}
+
+        <AnimatedSection animation="fadeInUp" delay={0.2}>
+          <LogoCarousel />
+        </AnimatedSection>
+
+        <AnimatedSection animation="fadeInUp" delay={0.3}>
+          <section className="section references-cta">
+            <div className="container">
+              <div className="references-cta-content">
+                <p className="references-cta-text">
+                  {language === 'en'
+                    ? 'Ready to communicate with clarity, confidence, and impact? Let\'s start the conversation.'
+                    : 'Prêt à communiquer avec clarté, confiance et impact ? Commençons la conversation.'}
+                </p>
+                <div className="references-cta-buttons">
+                  <a href="/contact" className="btn btn-primary">
+                    <i className="fas fa-paper-plane cta-contact-icon" aria-hidden="true"></i>
+                    {language === 'en' ? 'Get in Touch' : 'Contactez-nous'}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </AnimatedSection>
       </div>
     </>
   )
 }
 
 export default References
-

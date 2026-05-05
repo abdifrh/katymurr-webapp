@@ -4,7 +4,7 @@
 .admin-contact {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -15,7 +15,7 @@
 }
 
 .unread-count {
-  color: #9A4818;
+  color: #C19A6B;
   font-weight: 600;
   margin-left: 10px;
 }
@@ -26,21 +26,21 @@
   align-items: center;
   padding: 12px;
   background: #f9f9f9;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid #e0e0e0;
 }
 
 .filter-controls select {
   min-width: 180px;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid #c3c4c7;
   font-size: 14px;
   transition: all 0.2s ease;
 }
 
 .filter-controls select:focus {
-  border-color: #9A4818;
+  border-color: #C19A6B;
   box-shadow: 0 0 0 2px rgba(154, 72, 24, 0.1);
   outline: none;
 }
@@ -59,7 +59,7 @@
 .message-detail {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 24px;
   position: sticky;
   top: 20px;
@@ -117,7 +117,7 @@
   background: #fff;
   padding: 15px;
   border: 1px solid #c3c4c7;
-  border-radius: 3px;
+  border-radius: 0;
   white-space: pre-wrap;
   word-wrap: break-word;
   line-height: 1.6;
@@ -137,14 +137,14 @@
 .status-badge {
   display: inline-block;
   padding: 3px 8px;
-  border-radius: 3px;
+  border-radius: 0;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .status-badge.status-new {
-  background-color: #9A4818;
+  background-color: #C19A6B;
   color: #fff;
 }
 
@@ -216,7 +216,7 @@
   .wp-list-table tbody tr {
     display: block;
     border: 1px solid #c3c4c7;
-    border-radius: 4px;
+    border-radius: 0;
     margin-bottom: 15px;
     padding: 15px;
     background: #fff;

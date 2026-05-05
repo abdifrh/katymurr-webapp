@@ -6,16 +6,31 @@
 /* Global Styles - Katy Murr Website */
 
 :root {
-  /* Color Palette */
-  --color-cream: #F4F1E9;
-  --color-warm: #D69B71;
-  --color-accent: #9A4818;
-  --color-dark: #674439;
+  /* Color Palette - Tons Clairs */
+  --color-cream: #FAF8F5;
+  /* Blanc cassé lumineux */
+  --color-warm: #E5C89C;
+  /* Beige doré clair */
+  --color-accent: #C19A6B;
+  /* Camel/Tan - Marron clair */
+  --color-dark: #9B8272;
+  /* Taupe rosé - Brun clair */
   --color-white: #FFFFFF;
 
   /* Typography */
-  --font-primary: 'Lora', Georgia, serif;
+  --font-primary: 'Cormorant Garamond', Georgia, serif;
   --font-secondary: Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-secondary);
+  --font-size-base: 1.04rem;
+  --font-size-ui-sm: 0.98rem;
+  --font-size-ui-xs: 0.92rem;
+  --font-weight-body: 500;
+  --font-weight-ui: 600;
+  --line-height-body: 1.75;
+  --line-height-ui: 1.5;
+  --color-text-base: #6F5A4F;
+  --color-text-strong: #5A473D;
+  --color-heading: #58463D;
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -31,6 +46,48 @@
   --transition-slow: 0.5s ease;
 }
 
+:root[data-readability='classic'] {
+  --font-body: var(--font-primary);
+  --font-size-base: 1rem;
+  --font-size-ui-sm: 0.95rem;
+  --font-size-ui-xs: 0.9rem;
+  --font-weight-body: 400;
+  --font-weight-ui: 500;
+  --line-height-body: 1.7;
+  --line-height-ui: 1.45;
+  --color-text-base: var(--color-dark);
+  --color-text-strong: #826B5C;
+  --color-heading: var(--color-dark);
+}
+
+:root[data-readability='balanced'] {
+  --font-body: var(--font-secondary);
+  --font-size-base: 1.04rem;
+  --font-size-ui-sm: 0.98rem;
+  --font-size-ui-xs: 0.92rem;
+  --font-weight-body: 500;
+  --font-weight-ui: 600;
+  --line-height-body: 1.75;
+  --line-height-ui: 1.5;
+  --color-text-base: #6F5A4F;
+  --color-text-strong: #5A473D;
+  --color-heading: #58463D;
+}
+
+:root[data-readability='strong'] {
+  --font-body: var(--font-secondary);
+  --font-size-base: 1.1rem;
+  --font-size-ui-sm: 1.03rem;
+  --font-size-ui-xs: 0.98rem;
+  --font-weight-body: 500;
+  --font-weight-ui: 700;
+  --line-height-body: 1.8;
+  --line-height-ui: 1.55;
+  --color-text-base: #564338;
+  --color-text-strong: #46352D;
+  --color-heading: #3F3029;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -39,6 +96,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 /* Custom Scrollbar Styles - Global */
@@ -46,7 +104,7 @@ html {
 * {
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: #9A4818 #f1f1f1;
+  scrollbar-color: #C19A6B #f1f1f1;
 }
 
 /* WebKit browsers (Chrome, Safari, Edge) */
@@ -57,23 +115,24 @@ html {
 
 *::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 5px;
+  border-radius: 0;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #9A4818;
-  border-radius: 5px;
+  background: #C19A6B;
+  border-radius: 0;
   border: 2px solid #f1f1f1;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #7a3a14;
+  background: #A88A68;
 }
 
 /* Specific scrollbar for body and html */
-html, body {
+html,
+body {
   scrollbar-width: thin;
-  scrollbar-color: #9A4818 #f1f1f1;
+  scrollbar-color: #C19A6B #f1f1f1;
 }
 
 html::-webkit-scrollbar,
@@ -85,35 +144,43 @@ body::-webkit-scrollbar {
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 5px;
+  border-radius: 0;
 }
 
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background: #9A4818;
-  border-radius: 5px;
+  background: #C19A6B;
+  border-radius: 0;
   border: 2px solid #f1f1f1;
 }
 
 html::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover {
-  background: #7a3a14;
+  background: #A88A68;
 }
 
 body {
-  font-family: var(--font-primary);
+  font-family: var(--font-body);
   background-color: var(--color-cream);
-  color: var(--color-dark);
-  line-height: 1.7;
+  color: var(--color-text-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-body);
+  line-height: var(--line-height-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-primary);
   font-weight: 600;
   line-height: 1.3;
   margin-bottom: var(--spacing-sm);
-  color: var(--color-dark);
+  color: var(--color-heading);
 }
 
 h1 {
@@ -131,6 +198,7 @@ h3 {
 
 p {
   margin-bottom: var(--spacing-sm);
+  color: var(--color-text-base);
 }
 
 a {
@@ -163,7 +231,7 @@ body:not(.wp-admin) .btn {
   padding: 1rem 2.25rem !important;
   font-size: 1.1rem !important;
   font-weight: 600 !important;
-  border-radius: 6px !important;
+  border-radius: 0;
   min-height: 48px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -211,12 +279,29 @@ body:not(.wp-admin) .btn-secondary:hover {
   text-align: center;
 }
 
-.mt-sm { margin-top: var(--spacing-sm); }
-.mt-md { margin-top: var(--spacing-md); }
-.mt-lg { margin-top: var(--spacing-lg); }
-.mb-sm { margin-bottom: var(--spacing-sm); }
-.mb-md { margin-bottom: var(--spacing-md); }
-.mb-lg { margin-bottom: var(--spacing-lg); }
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -236,4 +321,3 @@ body:not(.wp-admin) .btn-secondary:hover {
     padding: var(--spacing-lg) 0;
   }
 }
-

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import DataTable from '../../components/DataTable/DataTable'
+import { fetchAdminContactMessages, deleteAdminContactMessage, markAdminContactMessageAsRead } from '../../services/api'
 import './AdminContact.css'
 
 interface ContactMessage {
@@ -16,47 +17,6 @@ interface ContactMessage {
   replied_at?: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const token = localStorage.getItem('supabase_token')
-
-async function fetchContactMessages(status?: string) {
-  const url = status 
-    ? `${API_BASE_URL}/contact?status=${status}`
-    : `${API_BASE_URL}/contact`
-  
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to fetch contact messages')
-  return response.json()
-}
-
-async function updateMessageStatus(id: string, status: string) {
-  const response = await fetch(`${API_BASE_URL}/contact/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ status }),
-  })
-  if (!response.ok) throw new Error('Failed to update message status')
-  return response.json()
-}
-
-async function deleteMessage(id: string) {
-  const response = await fetch(`${API_BASE_URL}/contact/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  })
-  if (!response.ok) throw new Error('Failed to delete message')
-  return response.json()
-}
-
 function AdminContact() {
   const [messages, setMessages] = useState<ContactMessage[]>([])
   const [loading, setLoading] = useState(true)
@@ -70,8 +30,10 @@ function AdminContact() {
   const loadMessages = async () => {
     try {
       setLoading(true)
-      const data = await fetchContactMessages(filterStatus || undefined)
-      setMessages(data)
+      const data = await fetchAdminContactMessages()
+      // Filter by status if needed
+      const filteredData = filterStatus ? data.filter((m: ContactMessage) => m.status === filterStatus) : data
+      setMessages(filteredData)
     } catch (error) {
       console.error('Error loading contact messages:', error)
     } finally {
@@ -81,7 +43,7 @@ function AdminContact() {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await updateMessageStatus(id, 'read')
+      await markAdminContactMessageAsRead(id)
       await loadMessages()
     } catch (error) {
       console.error('Error marking message as read:', error)
@@ -91,9 +53,9 @@ function AdminContact() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return
-    
+
     try {
-      await deleteMessage(id)
+      await deleteAdminContactMessage(id)
       if (selectedMessage?.id === id) {
         setSelectedMessage(null)
       }

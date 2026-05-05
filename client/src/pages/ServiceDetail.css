@@ -3,58 +3,110 @@
 }
 
 .service-header {
-  padding: var(--spacing-xl) 0;
+  padding: calc(var(--spacing-xl) * 2) 0;
   text-align: center;
   background-color: var(--color-cream);
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image de fond du hero */
+.service-hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.service-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.service-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(193, 154, 107, 0.381) 0%,
+    rgba(154, 72, 24, 0.485) 50%,
+    rgba(193, 154, 107, 0.15) 100%
+  );
+  z-index: 1;
+}
+
+/* Numéro du service en arrière-plan */
+.service-hero-number {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  font-family: var(--font-secondary), serif;
+  font-size: 15rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+.service-header .container {
+  position: relative;
+  z-index: 2;
 }
 
 .back-link {
   display: inline-block;
   margin-bottom: var(--spacing-md);
-  color: var(--color-accent);
+  color: #FFFFFF !important;
   text-decoration: none;
-  font-weight: 500;
-  transition: color var(--transition-fast);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .back-link:hover {
-  color: var(--color-warm);
+  color: #FFFFFF !important;
   text-decoration: underline;
+  opacity: 0.9;
 }
 
 .service-header h1 {
-  color: var(--color-dark);
+  color: #FFFFFF;
   margin-bottom: var(--spacing-md);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .service-subtitle {
   font-size: 1.3rem;
-  color: var(--color-accent);
+  color: #FFFFFF;
   margin-bottom: var(--spacing-sm);
   font-weight: 500;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .service-description {
   font-size: 1.1rem;
-  color: var(--color-dark);
+  color: #FFFFFF;
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.service-image-section {
-  padding: var(--spacing-xl) 0;
-}
-
-.service-featured-image {
-  width: 100%;
-  max-width: 1200px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
-  display: block;
-}
 
 .service-content-section {
   padding: var(--spacing-xl) 0;
@@ -140,7 +192,7 @@
   height: 2rem;
   background-color: var(--color-accent);
   color: var(--color-white);
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +216,7 @@
 .service-section-roi {
   background-color: var(--color-cream);
   padding: var(--spacing-lg);
-  border-radius: 8px;
+  border-radius: 0;
   margin: var(--spacing-lg) 0;
 }
 
@@ -203,7 +255,7 @@
   background-color: var(--color-dark);
   color: var(--color-white);
   padding: var(--spacing-xl);
-  border-radius: 8px;
+  border-radius: 0;
   text-align: center;
   margin: var(--spacing-xl) 0;
 }
@@ -231,7 +283,7 @@
   font-size: 1.1rem !important;
   font-weight: 600 !important;
   text-decoration: none;
-  border-radius: 6px !important;
+  border-radius: 0;
   transition: all var(--transition-fast);
   display: inline-flex !important;
   align-items: center !important;
@@ -239,30 +291,43 @@
   min-height: 48px !important;
 }
 
-.service-cta-buttons .btn-primary {
-  background-color: var(--color-accent);
-  color: var(--color-white);
+body:not(.wp-admin) .service-cta-buttons .btn-primary {
+  background-color: #FFFFFF !important;
+  color: #4D3A30 !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-.service-cta-buttons .btn-primary:hover {
-  background-color: var(--color-warm);
+body:not(.wp-admin) .service-cta-buttons .btn-primary:hover {
+  background-color: #F3E3CF !important;
+  color: #4D3A30 !important;
+  border-color: #F3E3CF !important;
   transform: translateY(-2px);
 }
 
-.service-cta-buttons .btn-secondary {
-  background-color: transparent;
-  color: var(--color-white);
-  border: 2px solid var(--color-white);
+body:not(.wp-admin) .service-cta-buttons .btn-secondary {
+  background-color: #FFFFFF !important;
+  color: #4D3A30 !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.service-cta-buttons .btn-secondary:hover {
-  background-color: var(--color-white);
-  color: var(--color-dark);
+body:not(.wp-admin) .service-cta-buttons .btn-secondary:hover {
+  background-color: #F7F1E8 !important;
+  color: #4D3A30 !important;
+  border-color: #F7F1E8 !important;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
   .service-header {
     padding: var(--spacing-lg) 0;
+    min-height: 300px;
+  }
+
+  .service-hero-number {
+    font-size: 8rem;
+    right: 2%;
   }
 
   .service-content h3 {
@@ -277,4 +342,3 @@
     width: 100%;
   }
 }
-

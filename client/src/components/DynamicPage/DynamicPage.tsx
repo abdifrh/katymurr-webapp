@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { fetchPage } from '../../services/api'
 import Loader from '../Loader/Loader'
 import AnimatedSection from '../AnimatedSection/AnimatedSection'
+import { SEO, BreadcrumbSchema } from '../SEO/SEO'
 import './DynamicPage.css'
 
 interface Page {
@@ -91,6 +93,20 @@ function DynamicPage({
           )}
         </Helmet>
 
+        {/* SEO Enhancements */}
+        <SEO
+          title={page.meta_title || page.title}
+          description={page.meta_description || fallbackMetaDescription || ''}
+          image={page.featured_image}
+          type="website"
+        />
+        <BreadcrumbSchema
+          items={[
+            { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+            { name: page.title, url: `/${page.slug}` },
+          ]}
+        />
+
         <div className={`dynamic-page ${className}`}>
           <AnimatedSection animation="fadeInUp">
             <section className="section page-header">
@@ -150,6 +166,20 @@ function DynamicPage({
         <meta name="twitter:title" content={fallbackTitle} />
         <meta name="twitter:description" content={fallbackMetaDescription || ''} />
       </Helmet>
+
+      {/* SEO Enhancements */}
+      <SEO
+        title={fallbackTitle}
+        description={fallbackMetaDescription || ''}
+        type="website"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: language === 'en' ? 'Home' : 'Accueil', url: '/' },
+          { name: fallbackTitle, url: `/${slug}` },
+        ]}
+      />
+
       <div className={`dynamic-page ${className}`}>
         {fallbackContent}
       </div>

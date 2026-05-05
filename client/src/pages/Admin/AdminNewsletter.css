@@ -1,7 +1,7 @@
 .wp-admin-newsletter {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -10,7 +10,7 @@
   gap: 0;
   border-bottom: 2px solid #f0f0f1;
   background: linear-gradient(to bottom, #fafafa, #f6f7f7);
-  border-radius: 8px 8px 0 0;
+  border-radius: 0;
   padding: 0 4px;
 }
 
@@ -29,13 +29,13 @@
 }
 
 .tab-button:hover {
-  color: #9A4818;
+  color: #C19A6B;
   background: rgba(154, 72, 24, 0.05);
 }
 
 .tab-button.active {
-  color: #9A4818;
-  border-bottom-color: #9A4818;
+  color: #C19A6B;
+  border-bottom-color: #C19A6B;
   background: #fff;
   font-weight: 600;
 }
@@ -120,7 +120,7 @@
   .wp-list-table tbody tr {
     display: block;
     border: 1px solid #c3c4c7;
-    border-radius: 4px;
+    border-radius: 0;
     margin-bottom: 15px;
     padding: 15px;
     background: #fff;

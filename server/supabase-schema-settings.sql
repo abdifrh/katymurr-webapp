@@ -38,14 +38,19 @@ INSERT INTO site_settings (key, value, type, category, language, description) VA
 ('seo_og_image', '', 'image', 'seo', NULL, 'Open Graph image for social media sharing'),
 
 -- Hero Section
+('hero_media_type', 'image', 'text', 'hero', NULL, 'Hero media type: image or video'),
 ('hero_image_url', '', 'image', 'hero', NULL, 'Hero section background image'),
+('hero_video_url', '', 'text', 'hero', NULL, 'Hero section background video URL'),
 ('hero_title_en', 'Welcome to Katy Murr', 'text', 'hero', 'en', 'Hero section title in English'),
 ('hero_title_fr', 'Bienvenue chez Katy Murr', 'text', 'hero', 'fr', 'Hero section title in French'),
 ('hero_subtitle_en', 'Professional English Coaching, Conference Interpreting & Writing Services', 'text', 'hero', 'en', 'Hero section subtitle in English'),
 ('hero_subtitle_fr', 'Services professionnels de Coaching en anglais, Interprétation de conférence & Écriture', 'text', 'hero', 'fr', 'Hero section subtitle in French'),
-('hero_cta_text_en', 'Get Started', 'text', 'hero', 'en', 'Hero CTA button text in English'),
-('hero_cta_text_fr', 'Commencer', 'text', 'hero', 'fr', 'Hero CTA button text in French'),
+('hero_cta_text_en', 'Start Improving Your Communication Today', 'text', 'hero', 'en', 'Hero CTA button text in English'),
+('hero_cta_text_fr', 'Commencez à améliorer votre communication dès aujourd''hui', 'text', 'hero', 'fr', 'Hero CTA button text in French'),
 ('hero_cta_link', '/contact', 'text', 'hero', NULL, 'Hero CTA button link'),
+
+-- CTA Section
+('cta_image_url', '', 'image', 'cta', NULL, 'CTA section image'),
 
 -- Contact Information
 ('contact_email', 'contact@katymurr.com', 'text', 'contact', NULL, 'Contact email address'),

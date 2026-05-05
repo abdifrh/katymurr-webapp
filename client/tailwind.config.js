@@ -7,14 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: '#F4F1E9',
-        warm: '#D69B71',
-        accent: '#9A4818',
-        dark: '#674439',
+        cream: '#FAF8F5',
+        warm: '#E5C89C',
+        accent: '#C19A6B',
+        dark: '#9B8272',
         white: '#FFFFFF',
       },
       fontFamily: {
-        primary: ['Lora', 'Georgia', 'serif'],
+        primary: ['Cormorant Garamond', 'Georgia', 'serif'],
         secondary: ['Georgia', 'Times New Roman', 'serif'],
       },
       spacing: {

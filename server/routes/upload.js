@@ -30,7 +30,7 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 100 * 1024 * 1024, // 100MB limit (increased for videos)
   },
 });
 
@@ -38,6 +38,7 @@ const upload = multer({
 function getBucketName(mimeType, category = 'media') {
   if (category === 'logo') return 'logos';
   if (category === 'favicon') return 'favicons';
+  if (category === 'video' || mimeType?.startsWith('video/')) return 'videos';
   if (mimeType?.startsWith('image/')) return 'media';
   return 'media';
 }

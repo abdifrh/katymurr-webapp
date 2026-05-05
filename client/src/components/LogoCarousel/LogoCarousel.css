@@ -1,0 +1,126 @@
+.logo-carousel-section {
+  padding: var(--spacing-xl) 0;
+  background-color: var(--color-light);
+  overflow: hidden;
+}
+
+.logo-carousel-section .section-title {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-dark);
+}
+
+.logo-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: var(--spacing-lg) 0;
+}
+
+/* Gradient de fondu sur les côtés */
+.logo-carousel-wrapper::before,
+.logo-carousel-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.logo-carousel-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-light), transparent);
+}
+
+.logo-carousel-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-light), transparent);
+}
+
+.logo-carousel-track {
+  display: flex;
+  gap: var(--spacing-xl);
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+}
+
+/* Animation de défilement infini */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause au survol */
+.logo-carousel-track:hover {
+  animation-play-state: paused;
+}
+
+.logo-item {
+  flex-shrink: 0;
+  width: 180px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all var(--transition-fast);
+}
+
+.logo-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.logo-item img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all var(--transition-fast);
+}
+
+.logo-item:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .logo-carousel-wrapper::before,
+  .logo-carousel-wrapper::after {
+    width: 50px;
+  }
+
+  .logo-item {
+    width: 140px;
+    height: 80px;
+    padding: var(--spacing-sm);
+  }
+
+  .logo-carousel-track {
+    gap: var(--spacing-md);
+    animation-duration: 20s;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-carousel-section .section-title {
+    font-size: 1.5rem;
+  }
+
+  .logo-item {
+    width: 120px;
+    height: 70px;
+  }
+}

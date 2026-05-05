@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../../utils/supabase'
-import { 
-  HiOutlineViewGrid, 
-  HiOutlineDocumentText, 
-  HiOutlineNewspaper, 
+import {
+  HiOutlineViewGrid,
+  HiOutlineDocumentText,
+  HiOutlineNewspaper,
   HiOutlineHome,
   HiOutlineStar,
   HiOutlinePhotograph,
@@ -15,7 +15,8 @@ import {
   HiOutlineCog,
   HiOutlineChatAlt,
   HiOutlineMenuAlt2,
-  HiOutlineLogout
+  HiOutlineLogout,
+  HiOutlineOfficeBuilding
 } from 'react-icons/hi'
 import './AdminDashboard.css'
 import './AdminResponsiveTables.css'
@@ -31,21 +32,25 @@ function AdminLayout() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('supabase_token')
-      if (!token) {
-        navigate('/admin/login')
-        return
-      }
-
       try {
-        const { data: { user }, error } = await supabase.auth.getUser(token)
-        if (user && !error) {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+        if (sessionError || !session) {
+          navigate('/admin/login')
+          setLoading(false)
+          return
+        }
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+        if (user && !userError) {
           setAuthenticated(true)
           setUser(user)
         } else {
           navigate('/admin/login')
         }
       } catch (error) {
+        console.error('Auth check error:', error)
         navigate('/admin/login')
       } finally {
         setLoading(false)
@@ -69,7 +74,6 @@ function AdminLayout() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    localStorage.removeItem('supabase_token')
     navigate('/admin/login')
   }
 
@@ -223,6 +227,18 @@ function AdminLayout() {
           >
             <HiOutlinePhotograph size={20} />
             <span className="menu-text">Media</span>
+          </Link>
+          <Link
+            to="/admin/client-logos"
+            className={`wp-admin-menu-item ${isActive('/admin/client-logos') ? 'current' : ''}`}
+            onClick={() => {
+              if (window.innerWidth <= 782) {
+                setMobileMenuOpen(false)
+              }
+            }}
+          >
+            <HiOutlineOfficeBuilding size={20} />
+            <span className="menu-text">Client Logos</span>
           </Link>
           <Link
             to="/admin/menu"

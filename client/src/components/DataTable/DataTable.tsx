@@ -45,6 +45,22 @@ function DataTable<T extends { id?: string }>({
     },
   })
 
+  const getSortIndicator = (sortingState: false | 'asc' | 'desc') => {
+    if (sortingState === 'asc') return '↑'
+    if (sortingState === 'desc') return '↓'
+    return '↕'
+  }
+
+  const getCellLabel = (header: unknown, columnId: string) => {
+    if (typeof header === 'string') return header
+    if (columnId) {
+      return columnId
+        .replace(/[_-]/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    }
+    return 'Field'
+  }
+
   if (loading) {
     return (
       <div className="data-table-loading">
@@ -73,12 +89,7 @@ function DataTable<T extends { id?: string }>({
                     <div className="th-content">
                       {flexRender(header.column.columnDef.header, header.getContext())}
                       {header.column.getCanSort() && (
-                        <span className="sort-indicator">
-                          {{
-                            asc: ' ↑',
-                            desc: ' ↓',
-                          }[header.column.getIsSorted() as string] ?? ' ⇅'}
-                        </span>
+                        <span className="sort-indicator">{getSortIndicator(header.column.getIsSorted())}</span>
                       )}
                     </div>
                   </th>
@@ -98,10 +109,15 @@ function DataTable<T extends { id?: string }>({
                 <tr
                   key={row.id}
                   onClick={() => onRowClick && onRowClick(row.original)}
-                  className={`${onRowClick ? 'clickable-row' : ''} ${getRowClassName ? getRowClassName(row.original) : ''}`}
+                  className={`${onRowClick ? 'clickable-row' : ''} ${
+                    getRowClassName ? getRowClassName(row.original) : ''
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} data-label={cell.column.columnDef.header as string}>
+                    <td
+                      key={cell.id}
+                      data-label={getCellLabel(cell.column.columnDef.header, cell.column.id)}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -116,4 +132,3 @@ function DataTable<T extends { id?: string }>({
 }
 
 export default DataTable
-
